@@ -25,23 +25,7 @@ Acesse `http://localhost:5173`
 - **E-mail:** `admin@portfolio.dev`
 - **Senha:** `admin123`
 
-## Estrutura de Pastas
 
-```
-src/
-├── components/
-│   ├── admin/          # CMS: formulário, listagem, layout admin
-│   ├── auth/           # ProtectedRoute
-│   ├── layout/         # Layout, Navbar, Footer
-│   ├── portfolio/      # ProjectCard, MarkdownRenderer
-│   └── ui/             # Button, Card, HoverZoomImage, SectionHeading
-├── context/            # AuthContext, ProjectsContext
-├── data/               # seedProjects (dados iniciais)
-├── pages/              # Home, Portfolio, Contato, Admin
-├── services/           # authService (JWT simulado), projectService (localStorage)
-├── styles/             # Tailwind + tema + estilos Markdown
-└── types/              # Tipagens TypeScript
-```
 
 ## Personalização
 
