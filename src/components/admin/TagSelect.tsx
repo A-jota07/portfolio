@@ -107,6 +107,97 @@ const techIcons: Record<string, React.ReactNode> = {
       <path d="M8 12h8M12 8v8" />
     </svg>
   ),
+  java: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#E76F00] text-[8px] font-black text-white leading-none font-sans select-none">JAVA</div>
+  ),
+  go: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#00ADD8] text-[8px] font-black text-white leading-none font-sans select-none">GO</div>
+  ),
+  rust: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#000000] text-[8px] font-black text-[#E16E0A] leading-none font-sans select-none">RUST</div>
+  ),
+  cpp: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#00599C] text-[8px] font-black text-white leading-none font-sans select-none">C++</div>
+  ),
+  csharp: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#178600] text-[8px] font-black text-white leading-none font-sans select-none">C#</div>
+  ),
+  ruby: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#CC342D] text-[8px] font-black text-white leading-none font-sans select-none">RB</div>
+  ),
+  php: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#777BB4] text-[8px] font-black text-white leading-none font-sans select-none">PHP</div>
+  ),
+  laravel: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#FF2D20] text-[8px] font-black text-white leading-none font-sans select-none">LVR</div>
+  ),
+  vue: (
+    <svg viewBox="0 0 256 221" className="h-3.5 w-3.5" fill="none">
+      <path d="M204.8 0H256L128 220.8L0 0h51.2L128 132.48L204.8 0z" fill="#41B883" />
+      <path d="M51.2 0H92.2L128 61.4L163.8 0h41L128 132.5L51.2 0z" fill="#35495E" />
+    </svg>
+  ),
+  angular: (
+    <svg viewBox="0 0 250 250" className="h-3.5 w-3.5" fill="currentColor" style={{ color: '#DD0031' }}>
+      <polygon points="125,30 125,30 125,30 31.9,63.2 46.1,186.3 125,230 125,230 125,230 203.9,186.3 218.1,63.2" />
+      <path d="M125,52.1L66.8,182.6h21.7l11.7-29.2h50.7l11.7,29.2h21.7L125,52.1z M113.8,125.1l11.2-27.9l11.2,27.9H113.8z" fill="#FFF" />
+    </svg>
+  ),
+  svelte: (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="#FF3E00" strokeWidth="2.5">
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
+    </svg>
+  ),
+  nestjs: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#E0234E] text-[8px] font-black text-white leading-none font-sans select-none">NST</div>
+  ),
+  mysql: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#4479A1] text-[8px] font-black text-white leading-none font-sans select-none">SQL</div>
+  ),
+  redis: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#DC382D] text-[8px] font-black text-white leading-none font-sans select-none">RDS</div>
+  ),
+  sqlite: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#003B57] text-[8px] font-black text-white leading-none font-sans select-none">SQL</div>
+  ),
+  prisma: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#2D3748] text-[8px] font-black text-white leading-none font-sans select-none">PRM</div>
+  ),
+  aws: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#FF9900] text-[8px] font-black text-black leading-none font-sans select-none">AWS</div>
+  ),
+  gcp: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#4285F4] text-[8px] font-black text-white leading-none font-sans select-none">GCP</div>
+  ),
+  vercel: (
+    <svg viewBox="0 0 100 100" className="h-3.5 w-3.5" fill="currentColor" style={{ color: '#000000' }}>
+      <polygon points="50,15 95,85 5,85" />
+    </svg>
+  ),
+  netlify: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#00AD9F] text-[8px] font-black text-white leading-none font-sans select-none">NTF</div>
+  ),
+  kubernetes: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#326CE5] text-[8px] font-black text-white leading-none font-sans select-none">K8S</div>
+  ),
+  jest: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#C21325] text-[8px] font-black text-white leading-none font-sans select-none">JEST</div>
+  ),
+  cypress: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#17202C] text-[8px] font-black text-[#49C39E] leading-none font-sans select-none">CY</div>
+  ),
+  storybook: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#FF4785] text-[8px] font-black text-white leading-none font-sans select-none">SB</div>
+  ),
+  stripe: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#008CFF] text-[8px] font-black text-white leading-none font-sans select-none">STP</div>
+  ),
+  springboot: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#6DB33F] text-[8px] font-black text-white leading-none font-sans select-none">SPG</div>
+  ),
+  django: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#092E20] text-[8px] font-black text-white leading-none font-sans select-none">DJG</div>
+  ),
 }
 
 // Synonyms and normalizations map
@@ -146,6 +237,40 @@ const normalizedKeys: Record<string, string> = {
   graphql: 'graphql',
   gql: 'graphql',
   redux: 'redux',
+  java: 'java',
+  go: 'go',
+  golang: 'go',
+  rust: 'rust',
+  cpp: 'cpp',
+  cplusplus: 'cpp',
+  csharp: 'csharp',
+  ruby: 'ruby',
+  rails: 'ruby',
+  php: 'php',
+  laravel: 'laravel',
+  vue: 'vue',
+  vuejs: 'vue',
+  angular: 'angular',
+  svelte: 'svelte',
+  nestjs: 'nestjs',
+  mysql: 'mysql',
+  redis: 'redis',
+  sqlite: 'sqlite',
+  prisma: 'prisma',
+  aws: 'aws',
+  gcp: 'gcp',
+  googlecloud: 'gcp',
+  vercel: 'vercel',
+  netlify: 'netlify',
+  kubernetes: 'kubernetes',
+  k8s: 'kubernetes',
+  jest: 'jest',
+  cypress: 'cypress',
+  storybook: 'storybook',
+  stripe: 'stripe',
+  springboot: 'springboot',
+  spring: 'springboot',
+  django: 'django',
 }
 
 export function getTechIcon(techName: string) {
@@ -179,6 +304,33 @@ export const PREDEFINED_TECHS = [
   'Firebase',
   'GraphQL',
   'Redux',
+  'Java',
+  'Go',
+  'Rust',
+  'C++',
+  'C#',
+  'Ruby',
+  'PHP',
+  'Laravel',
+  'Vue.js',
+  'Angular',
+  'Svelte',
+  'NestJS',
+  'MySQL',
+  'Redis',
+  'SQLite',
+  'Prisma',
+  'AWS',
+  'Google Cloud',
+  'Vercel',
+  'Netlify',
+  'Kubernetes',
+  'Jest',
+  'Cypress',
+  'Storybook',
+  'Stripe',
+  'Spring Boot',
+  'Django',
 ]
 
 interface TagSelectProps {
