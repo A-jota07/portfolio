@@ -2,6 +2,8 @@ import { useState } from 'react'
 import type { ProjectInput } from '@/types/project'
 import { Button } from '@/components/ui/Button'
 import { MarkdownRenderer } from '@/components/portfolio/MarkdownRenderer'
+import { Editor } from './Editor'
+import { TagSelect } from './TagSelect'
 
 interface ProjectFormProps {
   initialData?: Partial<ProjectInput>
@@ -24,18 +26,11 @@ export function ProjectForm({
   submitLabel = 'Salvar Projeto',
 }: ProjectFormProps) {
   const [form, setForm] = useState<ProjectInput>({ ...emptyForm, ...initialData })
-  const [tagsInput, setTagsInput] = useState((initialData?.tags ?? []).join(', '))
   const [showPreview, setShowPreview] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({
-      ...form,
-      tags: tagsInput
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
-    })
+    onSubmit(form)
   }
 
   const updateField = <K extends keyof ProjectInput>(key: K, value: ProjectInput[K]) => {
@@ -81,14 +76,12 @@ export function ProjectForm({
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-surface-700">
-              Tags (separadas por vírgula)
+              Linguagens e Tecnologias
             </label>
-            <input
-              type="text"
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
-              placeholder="React, TypeScript, Tailwind"
-              className="w-full rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-accent-400/40"
+            <TagSelect
+              selectedTags={form.tags}
+              onChange={(tags) => updateField('tags', tags)}
+              placeholder="Buscar ou adicionar tecnologias (ex: React, TypeScript, D3.js)..."
             />
           </div>
           <label className="flex items-center gap-2 text-sm text-surface-600">
@@ -118,13 +111,10 @@ export function ProjectForm({
               <MarkdownRenderer content={form.content || '*Nenhum conteúdo ainda.*'} />
             </div>
           ) : (
-            <textarea
-              required
-              rows={18}
+            <Editor
               value={form.content}
-              onChange={(e) => updateField('content', e.target.value)}
-              placeholder="## Título do Projeto&#10;&#10;Descreva o projeto em Markdown..."
-              className="w-full rounded-xl border border-surface-200 bg-white px-4 py-3 font-mono text-sm leading-relaxed outline-none transition-shadow focus:ring-2 focus:ring-accent-400/40"
+              onChange={(value) => updateField('content', value)}
+              placeholder="Escreva o conteúdo em Markdown com suporte a código e imagens..."
             />
           )}
         </div>

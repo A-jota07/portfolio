@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import type { Project } from '@/types/project'
 import { Card } from '@/components/ui/Card'
 import { HoverZoomImage } from '@/components/ui/HoverZoomImage'
+import { getTechIcon } from '@/components/admin/TagSelect'
 
 interface ProjectCardProps {
   project: Project
@@ -25,9 +26,10 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-surface-100 px-3 py-1 text-xs font-medium text-surface-600"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-surface-100 px-3 py-1 text-xs font-medium text-surface-600"
                 >
-                  {tag}
+                  {getTechIcon(tag)}
+                  <span>{tag}</span>
                 </span>
               ))}
             </div>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Project } from '@/types/project'
 import { Button } from '@/components/ui/Button'
+import { getTechIcon } from './TagSelect'
 
 interface ProjectListProps {
   projects: Project[]
@@ -48,9 +49,10 @@ export function ProjectList({ projects, onDelete }: ProjectListProps) {
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full bg-surface-100 px-2 py-0.5 text-xs text-surface-600"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-surface-100 px-2.5 py-0.5 text-xs text-surface-600 border border-surface-200/50"
                     >
-                      {tag}
+                      {getTechIcon(tag)}
+                      <span>{tag}</span>
                     </span>
                   ))}
                 </div>

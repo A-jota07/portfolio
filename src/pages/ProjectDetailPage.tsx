@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useProjects } from '@/context/ProjectsContext'
 import { MarkdownRenderer } from '@/components/portfolio/MarkdownRenderer'
 import { Button } from '@/components/ui/Button'
+import { getTechIcon } from '@/components/admin/TagSelect'
 
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -39,9 +40,10 @@ export function ProjectDetailPage() {
             {project.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full bg-surface-100 px-3 py-1 text-xs font-medium text-surface-600"
+                className="inline-flex items-center gap-1.5 rounded-full bg-surface-100 px-3 py-1 text-xs font-medium text-surface-600"
               >
-                {tag}
+                {getTechIcon(tag)}
+                <span>{tag}</span>
               </span>
             ))}
           </div>
