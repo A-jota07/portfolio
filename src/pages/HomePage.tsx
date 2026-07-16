@@ -57,7 +57,7 @@ export function HomePage() {
             </h1>
             <p className="mb-8 max-w-lg text-lg leading-relaxed text-surface-500">
               Construo experiências digitais minimalistas, performáticas e acessíveis.
-              Especializado em React, TypeScript e design systems.
+              Especializado em React, TypeScript, JavaScript, Python e design systems.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/portfolio">
