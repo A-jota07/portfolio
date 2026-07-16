@@ -52,8 +52,8 @@ export function HomePage() {
               Olá, eu sou
             </p>
             <h1 className="mb-6 text-4xl font-semibold leading-tight tracking-tight text-surface-900 md:text-5xl lg:text-6xl">
-              Seu Nome
-              <span className="block text-gradient">Desenvolvedor Front-end</span>
+              Alexandre Junior
+              <span className="block text-gradient">Desenvolvedor Full-Stack</span>
             </h1>
             <p className="mb-8 max-w-lg text-lg leading-relaxed text-surface-500">
               Construo experiências digitais minimalistas, performáticas e acessíveis.
