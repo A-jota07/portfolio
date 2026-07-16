@@ -1,6 +1,6 @@
 import type { AuthUser, LoginCredentials, LoginResponse } from '@/types/auth'
 
-const TOKEN_KEY = 'portfolio_auth_token'
+const TOKEN_KEY = 'portfolio_auth_token' 
 const API_BASE = '/api'
 
 function getStoredToken(): string | null {

@@ -74,10 +74,6 @@ export function LoginPage() {
             Entrar
           </Button>
         </form>
-
-        <p className="mt-6 text-center text-xs text-surface-400">
-          Demo: admin@portfolio.dev / admin123
-        </p>
       </motion.div>
     </div>
   )
