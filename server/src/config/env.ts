@@ -2,7 +2,9 @@ import { config } from 'dotenv'
 import { resolve } from 'path'
 import { z } from 'zod'
 
-config({ path: resolve(process.cwd(), '../.env') })
+if (process.env.NODE_ENV !== 'production') {
+  config({ path: resolve(process.cwd(), '../.env') })
+}
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -19,12 +21,4 @@ const envSchema = z.object({
   LOGIN_RATE_LIMIT_MAX: z.coerce.number().default(5),
 })
 
-const parsed = envSchema.safeParse(process.env)
-
-if (!parsed.success) {
-  console.error('❌ Variáveis de ambiente inválidas:')
-  console.error(parsed.error.flatten().fieldErrors)
-  process.exit(1)
-}
-
-export const env = parsed.data
+export const env = envSchema.parse(process.env)
