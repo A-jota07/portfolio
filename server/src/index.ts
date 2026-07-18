@@ -38,6 +38,6 @@ app.use((_req, res) => {
 })
 
 app.listen(env.PORT, () => {
-  console.log(`🔐 API rodando em http://localhost:${env.PORT}`)
+  console.log(`🔐 API rodando em ${env.PORT}`)
   console.log(`   Ambiente: ${env.NODE_ENV}`)
 })
