@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/login",
+      "destination": "https://portfolio-7znl.onrender.com/login"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://portfolio-7znl.onrender.com/:path*"
     },
