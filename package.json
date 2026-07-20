@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@mdxeditor/editor": "^4.0.4",
     "framer-motion": "^12.23.12",
     "lucide-react": "^1.24.0",

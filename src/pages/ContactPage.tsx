@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import emailjs from '@emailjs/browser' // <--- 1. Importação adicionada
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Button } from '@/components/ui/Button'
 
@@ -12,7 +13,7 @@ const contactLinks = [
   },
   {
     label: 'LinkedIn',
-    value: 'Alexandre Junior', 
+    value: 'Alexandre Junior',
     href: 'https://linkedin.com/in/alexandre-c-souza-jr',
     description: 'Conecte-se profissionalmente',
   },
@@ -27,10 +28,34 @@ const contactLinks = [
 export function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false) // State para loading do botão
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    setLoading(true)
+
+    // Configurações do EmailJS
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+    // Mapeamento dos campos do seu formulário para o template
+    const templateParams = {
+      from_name: form.name,
+      from_email: form.email,
+      message: form.message,
+      to_name: 'Alexandre',
+    }
+
+    try {
+      await emailjs.send(serviceId, templateId, templateParams, publicKey)
+      setSubmitted(true)
+    } catch (error) {
+      console.error('Erro ao enviar e-mail:', error)
+      alert('Houve um erro ao enviar a mensagem. Tente novamente mais tarde.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -122,8 +147,8 @@ export function ContactPage() {
                       className="w-full rounded-xl border border-surface-200 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent-400/40"
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Enviar Mensagem
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Enviando...' : 'Enviar Mensagem'}
                   </Button>
                 </div>
               </form>
