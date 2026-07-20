@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 export function LoginPage() {
   const { login, isAuthenticated } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('admin@portfolio.dev')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -52,6 +52,7 @@ export function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="Digite seu e-mail..."
               className="w-full rounded-xl border border-surface-200 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent-400/40"
             />
           </div>
@@ -62,6 +63,7 @@ export function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
               className="w-full rounded-xl border border-surface-200 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent-400/40"
             />
           </div>
