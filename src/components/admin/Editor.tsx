@@ -23,6 +23,7 @@ import {
   InsertCodeBlock,
   type MDXEditorMethods
 } from '@mdxeditor/editor'
+import { uploadImageFile, resolveImageUrl } from '@/services/uploadService'
 
 // Import library styles
 import '@mdxeditor/editor/style.css'
@@ -64,37 +65,13 @@ export function Editor({ value, onChange, placeholder }: EditorProps) {
           linkDialogPlugin(),
           imagePlugin({
             imageUploadHandler: async (file: File) => {
-              // MOCK: URL temporária local para exibição imediata no editor
-              const tempUrl = URL.createObjectURL(file)
-              
-              console.log('Upload de Imagem:', file.name, 'URL gerada:', tempUrl)
-              
-              /*
-                ========================================================================
-                [ATENÇÃO] - INTEGRAÇÃO COM API REAL
-                ========================================================================
-                Para salvar as imagens no seu banco de dados ou serviço de storage (S3, Cloudinary, etc.),
-                comente a linha acima e implemente a chamada à sua API aqui. Exemplo:
-
-                const formData = new FormData()
-                formData.append('image', file)
-
-                const response = await fetch('/api/upload', {
-                  method: 'POST',
-                  body: formData,
-                  headers: {
-                    // Adicione cabeçalhos de autorização se necessário (JWT)
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                  }
-                })
-
-                if (!response.ok) throw new Error('Falha no upload da imagem')
-                const data = await response.json()
-                return data.url // URL pública da imagem salva
-                ========================================================================
-              */
-              
-              return tempUrl
+              try {
+                const response = await uploadImageFile(file)
+                return resolveImageUrl(response.url)
+              } catch (err) {
+                console.error('Erro no upload de imagem via MDXEditor:', err)
+                return URL.createObjectURL(file)
+              }
             }
           }),
           codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),

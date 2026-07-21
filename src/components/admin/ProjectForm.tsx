@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { MarkdownRenderer } from '@/components/portfolio/MarkdownRenderer'
 import { Editor } from './Editor'
 import { TagSelect } from './TagSelect'
+import { ImageUploadInput } from './ImageUploadInput'
 
 interface ProjectFormProps {
   initialData?: Partial<ProjectInput>
@@ -27,9 +28,17 @@ export function ProjectForm({
 }: ProjectFormProps) {
   const [form, setForm] = useState<ProjectInput>({ ...emptyForm, ...initialData })
   const [showPreview, setShowPreview] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError(null)
+
+    if (!form.coverImage) {
+      setFormError('Por favor, faça o upload de uma imagem de capa ou informe uma URL externa.')
+      return
+    }
+
     onSubmit(form)
   }
 
@@ -39,6 +48,12 @@ export function ProjectForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {formError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {formError}
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-4">
           <div>
@@ -61,19 +76,13 @@ export function ProjectForm({
               className="w-full rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-accent-400/40"
             />
           </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">
-              URL da Imagem de Capa
-            </label>
-            <input
-              type="url"
-              required
-              value={form.coverImage}
-              onChange={(e) => updateField('coverImage', e.target.value)}
-              placeholder="https://..."
-              className="w-full rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-accent-400/40"
-            />
-          </div>
+
+          {/* Componente flexível de imagem de capa: Upload vs URL */}
+          <ImageUploadInput
+            value={form.coverImage}
+            onChange={(url) => updateField('coverImage', url)}
+          />
+
           <div>
             <label className="mb-1.5 block text-sm font-medium text-surface-700">
               Linguagens e Tecnologias

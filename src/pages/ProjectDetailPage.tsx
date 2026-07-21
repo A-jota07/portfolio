@@ -4,6 +4,7 @@ import { useProjects } from '@/context/ProjectsContext'
 import { MarkdownRenderer } from '@/components/portfolio/MarkdownRenderer'
 import { Button } from '@/components/ui/Button'
 import { getTechIcon } from '@/components/admin/TagSelect'
+import { resolveImageUrl } from '@/services/uploadService'
 
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -55,7 +56,7 @@ export function ProjectDetailPage() {
 
           <div className="group mb-12 overflow-hidden rounded-2xl shadow-elevated">
             <motion.img
-              src={project.coverImage}
+              src={resolveImageUrl(project.coverImage)}
               alt={project.title}
               className="aspect-[21/9] w-full object-cover"
               whileHover={{ scale: 1.04 }}

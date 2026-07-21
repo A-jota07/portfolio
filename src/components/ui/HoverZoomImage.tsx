@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { resolveImageUrl } from '@/services/uploadService'
 
 interface HoverZoomImageProps {
   src: string
@@ -13,10 +14,12 @@ export function HoverZoomImage({
   className = '',
   aspectRatio = 'aspect-[16/10]',
 }: HoverZoomImageProps) {
+  const resolvedSrc = resolveImageUrl(src)
+
   return (
     <div className={`relative overflow-hidden ${aspectRatio} ${className}`}>
       <motion.img
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         loading="lazy"
         className="h-full w-full object-cover"
