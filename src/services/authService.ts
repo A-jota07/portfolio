@@ -1,7 +1,11 @@
 import type { AuthUser, LoginCredentials, LoginResponse } from '@/types/auth'
 
-const TOKEN_KEY = 'portfolio_auth_token' 
-const API_BASE = '/api'
+const TOKEN_KEY = 'portfolio_auth_token'
+
+// 1. Pegamos a URL da Render vinda da Vercel. Se estiver rodando local, usa fallback.
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+// 2. Definimos o prefixo global da sua API (/api)
+const API_BASE = `${BASE_URL}/api`
 
 function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
@@ -27,6 +31,7 @@ async function fetchWithAuth<T>(path: string, options: RequestInit = {}): Promis
     headers.set('Content-Type', 'application/json')
   }
 
+  // Aqui ele vai montar: https://sua-api.onrender.com/api + /auth/login
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
