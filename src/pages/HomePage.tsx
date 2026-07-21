@@ -142,7 +142,7 @@ export function HomePage() {
               className="relative overflow-hidden rounded-3xl border border-surface-200 bg-white shadow-elevated transition-shadow duration-300 hover:shadow-2xl"
             >
               <img
-                src="assets/fotoHome.png"
+                src="src/assets/fotoHome.png"
                 alt="Foto de perfil"
                 className="aspect-square w-full object-cover"
               />
