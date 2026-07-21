@@ -16,11 +16,11 @@ export function SectionHeading({
   return (
     <div className={`mb-12 max-w-2xl ${alignClass}`}>
       {eyebrow && (
-        <p className="mb-2 text-sm font-medium uppercase tracking-widest text-accent-600">
+        <span className="mb-3 inline-block rounded-full bg-surface-900 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white shadow-sm">
           {eyebrow}
-        </p>
+        </span>
       )}
-      <h2 className="text-3xl font-semibold tracking-tight text-surface-900 md:text-4xl">
+      <h2 className="text-3xl font-bold tracking-tight text-surface-900 md:text-4xl">
         {title}
       </h2>
       {subtitle && (

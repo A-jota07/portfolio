@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, type Variants } from 'framer-motion'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Button } from '@/components/ui/Button'
 import { ProjectCard } from '@/components/portfolio/ProjectCard'
@@ -35,39 +35,84 @@ const socialLinks = [
   },
 ]
 
+// Variantes com tipagem estrita para o Framer Motion
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: 'easeOut' },
+  },
+}
+
+const imageVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.94, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: 'easeOut', delay: 0.25 },
+  },
+}
+
 export function HomePage() {
   const { projects } = useProjects()
   const featured = projects.filter((p) => p.featured).slice(0, 3)
 
   return (
     <>
-      <section className="bg-gradient-hero px-6 py-20 md:py-28">
+      <section className="bg-gradient-hero border-b border-surface-200/60 px-6 py-20 md:py-28 overflow-hidden">
         <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
+          {/* Textos e Botões com entrada em sequência (stagger) */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-6"
           >
-            <p className="mb-4 text-sm font-medium uppercase tracking-widest text-accent-600">
-              Olá, eu sou
-            </p>
-            <h1 className="mb-6 text-4xl font-semibold leading-tight tracking-tight text-surface-900 md:text-5xl lg:text-6xl">
+            <motion.div variants={itemVariants}>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-900 px-3.5 py-1 text-xs font-semibold text-white shadow-sm">
+                Olá, eu sou 👋
+              </span>
+            </motion.div>
+
+            <motion.h1
+              variants={itemVariants}
+              className="text-4xl font-bold leading-tight tracking-tight text-surface-900 md:text-5xl lg:text-6xl"
+            >
               Alexandre Junior
               <span className="block text-gradient">Desenvolvedor Full-Stack</span>
-            </h1>
-            <p className="mb-8 max-w-lg text-lg leading-relaxed text-surface-500">
+            </motion.h1>
+
+            <motion.p
+              variants={itemVariants}
+              className="max-w-lg text-lg leading-relaxed text-surface-500"
+            >
               Construo experiências digitais minimalistas, performáticas e acessíveis.
               Especializado em React, TypeScript, JavaScript, Python e design systems.
-            </p>
-            <div className="flex flex-wrap gap-4">
+            </motion.p>
+
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-4 pt-2">
               <Link to="/portfolio">
-                <Button>Ver Portfólio</Button>
+                <Button variant="primary">Ver Portfólio</Button>
               </Link>
               <Link to="/contato">
                 <Button variant="secondary">Entrar em Contato</Button>
               </Link>
-            </div>
-            <div className="mt-10 flex gap-4">
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="flex items-center gap-3 pt-4">
               {socialLinks.map((link) => (
                 <a
                   key={link.label}
@@ -75,30 +120,33 @@ export function HomePage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-surface-200 bg-white/60 text-surface-500 transition-all hover:border-accent-400 hover:text-surface-800 hover:shadow-soft"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl border border-surface-200 bg-white text-surface-800 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-surface-900 hover:bg-surface-900 hover:text-white hover:shadow-soft"
                 >
                   {link.icon}
                 </a>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
 
+          {/* Foto de perfil com animação de entrada suave e hover scale 1.02 */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            variants={imageVariants}
+            initial="hidden"
+            animate="visible"
             className="relative mx-auto w-full max-w-sm"
           >
-            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-accent-400/20 to-surface-200/40 blur-2xl" />
-            <div className="relative overflow-hidden rounded-3xl border border-surface-200/80 shadow-elevated">
-              <motion.img
+            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-surface-200/50 via-accent-400/10 to-surface-300/30 blur-2xl opacity-70" />
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+              className="relative overflow-hidden rounded-3xl border border-surface-200 bg-white shadow-elevated transition-shadow duration-300 hover:shadow-2xl"
+            >
+              <img
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&q=80"
                 alt="Foto de perfil"
                 className="aspect-square w-full object-cover"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.5 }}
               />
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
