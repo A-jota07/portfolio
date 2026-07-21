@@ -4,7 +4,6 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Button } from '@/components/ui/Button'
 import { ProjectCard } from '@/components/portfolio/ProjectCard'
 import { useProjects } from '@/context/ProjectsContext'
-import profilePicture from '@/../../public/fotoHome.png'
 
 const socialLinks = [
   {
@@ -143,7 +142,7 @@ export function HomePage() {
               className="relative overflow-hidden rounded-3xl border border-surface-200 bg-white shadow-elevated transition-shadow duration-300 hover:shadow-2xl"
             >
               <img
-                src={profilePicture}
+                src="/fotoHome.png"
                 alt="Foto de perfil"
                 className="aspect-square w-full object-cover"
               />
