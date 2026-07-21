@@ -4,7 +4,7 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Button } from '@/components/ui/Button'
 import { ProjectCard } from '@/components/portfolio/ProjectCard'
 import { useProjects } from '@/context/ProjectsContext'
-import profilePicture from '@fotoHome.png'
+import profilePicture from '@/../../public/fotoHome.png'
 
 const socialLinks = [
   {
