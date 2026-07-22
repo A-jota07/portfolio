@@ -26,11 +26,16 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
+  const isInteractive = !disabled && !isLoading
+
   return (
     <motion.button
-      whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
-      whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${variantStyles[variant]} ${className}`}
+      whileHover={isInteractive ? { scale: 1.03 } : undefined}
+      whileTap={isInteractive ? { scale: 0.96 } : undefined}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
+        isInteractive ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+      } ${variantStyles[variant]} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >

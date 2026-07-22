@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion'
+
 interface SectionHeadingProps {
   eyebrow?: string
   title: string
@@ -14,7 +16,13 @@ export function SectionHeading({
   const alignClass = align === 'center' ? 'text-center mx-auto' : ''
 
   return (
-    <div className={`mb-12 max-w-2xl ${alignClass}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className={`mb-12 max-w-2xl ${alignClass}`}
+    >
       {eyebrow && (
         <span className="mb-3 inline-block rounded-full bg-surface-900 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white shadow-sm">
           {eyebrow}
@@ -26,6 +34,6 @@ export function SectionHeading({
       {subtitle && (
         <p className="mt-3 text-lg leading-relaxed text-surface-500">{subtitle}</p>
       )}
-    </div>
+    </motion.div>
   )
 }

@@ -48,11 +48,11 @@ const containerVariants: Variants = {
 }
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' },
+    transition: { duration: 0.6, ease: 'easeOut' },
   },
 }
 
@@ -164,11 +164,17 @@ export function HomePage() {
                 <ProjectCard key={project.id} project={project} index={index} />
               ))}
             </div>
-            <div className="mt-12 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="mt-12 text-center"
+            >
               <Link to="/portfolio">
                 <Button variant="secondary">Ver todos os projetos</Button>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </section>
       )}
