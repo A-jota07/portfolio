@@ -99,8 +99,9 @@ export function HomePage() {
               variants={itemVariants}
               className="max-w-lg text-lg leading-relaxed text-surface-500"
             >
-              Construo experiências digitais minimalistas, performáticas e acessíveis.
-              Especializado em React, TypeScript, JavaScript, Python e design systems.
+              Estudante de Ciência da Computação especializado no desenvolvimento 
+              de aplicações web completas. Experiência na criação de APIs (Node.js, Java) e 
+              aplicações reativas (TypeScript, React, Vue)
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-wrap gap-4 pt-2">
