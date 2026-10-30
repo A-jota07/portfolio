@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { GitBranch } from 'lucide-react'
 import type { ProjectInput } from '@/types/project'
 import { Button } from '@/components/ui/Button'
 import { MarkdownRenderer } from '@/components/portfolio/MarkdownRenderer'
@@ -19,6 +20,7 @@ const emptyForm: ProjectInput = {
   tags: [],
   content: '',
   featured: false,
+  repositoryUrl: '',
 }
 
 export function ProjectForm({
@@ -97,6 +99,26 @@ export function ProjectForm({
             value={form.coverImage}
             onChange={(url) => updateField('coverImage', url)}
           />
+
+          <div>
+            <label className="mb-1.5 flex items-center justify-between font-mono text-xs font-medium text-surface-700">
+              <span className="flex items-center gap-1.5">
+                <GitBranch className="h-3.5 w-3.5 text-accent-400" />
+                <span>Repositório (GitHub / GitLab)</span>
+              </span>
+              <span className="font-normal text-surface-400">opcional</span>
+            </label>
+            <input
+              type="url"
+              value={form.repositoryUrl || ''}
+              onChange={(e) => updateField('repositoryUrl', e.target.value)}
+              placeholder="https://github.com/usuario/repositorio"
+              className="w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-2.5 font-mono text-sm text-surface-900 outline-none transition-colors focus:border-accent-400 placeholder:text-surface-400"
+            />
+            <p className="mt-1 font-mono text-[11px] text-surface-500">
+              Se preenchido, um link direto para o repositório será exibido no post do projeto.
+            </p>
+          </div>
 
           <div>
             <label className="mb-1.5 block font-mono text-xs font-medium text-surface-700">

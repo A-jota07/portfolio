@@ -7,6 +7,7 @@ export interface Project {
   tags: string[]
   content: string
   featured: boolean
+  repositoryUrl?: string
   createdAt: string
   updatedAt: string
 }
@@ -18,4 +19,5 @@ export interface ProjectInput {
   tags: string[]
   content: string
   featured?: boolean
+  repositoryUrl?: string
 }

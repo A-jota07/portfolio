@@ -54,6 +54,14 @@ function normalizeSupabaseRow(row: Record<string, unknown>): Project {
     row.content ?? row.architecture_details ?? row.description ?? '',
   )
   const featured = typeof row.featured === 'boolean' ? row.featured : true
+
+  const rawRepo =
+    row.repository_url ?? row.repositoryUrl ?? row.github_url ?? row.githubUrl
+  const repositoryUrl =
+    typeof rawRepo === 'string' && rawRepo.trim().length > 0
+      ? rawRepo.trim()
+      : undefined
+
   const createdAt = String(row.created_at ?? row.createdAt ?? new Date().toISOString())
   const updatedAt = String(
     row.updated_at ?? row.updatedAt ?? row.created_at ?? new Date().toISOString(),
@@ -68,6 +76,7 @@ function normalizeSupabaseRow(row: Record<string, unknown>): Project {
     tags,
     content,
     featured,
+    repositoryUrl,
     createdAt,
     updatedAt,
   }
@@ -146,6 +155,7 @@ export function createProject(input: ProjectInput): Project {
     tags: input.tags,
     content: input.content,
     featured: input.featured ?? false,
+    repositoryUrl: input.repositoryUrl?.trim() || undefined,
     createdAt: now,
     updatedAt: now,
   }
@@ -190,6 +200,7 @@ export async function createProjectRemote(input: ProjectInput): Promise<Project>
         category: input.tags[0] || 'Desenvolvimento Web',
         technologies: input.tags,
         architecture_details: input.content,
+        github_url: input.repositoryUrl?.trim() || null,
         cover_url: input.coverImage,
       }
       const { data, error } = await supabaseClient
@@ -222,6 +233,10 @@ export function updateProject(id: string, input: Partial<ProjectInput>): Project
     ...existing,
     ...input,
     slug: input.title ? slugify(input.title) : existing.slug,
+    repositoryUrl:
+      input.repositoryUrl !== undefined
+        ? input.repositoryUrl?.trim() || undefined
+        : existing.repositoryUrl,
     updatedAt: new Date().toISOString(),
   }
   projects[index] = updated
@@ -271,6 +286,7 @@ export async function updateProjectRemote(
         category: localUpdated.tags[0] || 'Desenvolvimento Web',
         technologies: localUpdated.tags,
         architecture_details: localUpdated.content,
+        github_url: localUpdated.repositoryUrl || null,
         cover_url: localUpdated.coverImage,
       }
       await supabaseClient.from('projects').update(dbPayload).eq('id', id)

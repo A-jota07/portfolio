@@ -13,6 +13,7 @@ export interface ProjectRecord {
   tags: string[]
   content: string
   featured: boolean
+  repositoryUrl?: string
   createdAt: string
   updatedAt: string
 }
@@ -24,6 +25,7 @@ export interface ProjectInputPayload {
   tags: string[]
   content: string
   featured?: boolean
+  repositoryUrl?: string
 }
 
 function slugify(text: string): string {
@@ -70,6 +72,7 @@ const DEFAULT_SEED_PROJECTS: ProjectRecord[] = [
       'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
     tags: ['React', 'TypeScript', 'D3.js'],
     featured: true,
+    repositoryUrl: 'https://github.com/A-jota07/portfolio',
     createdAt: '2025-11-01T10:00:00.000Z',
     updatedAt: '2025-11-01T10:00:00.000Z',
     content: `## Visão Geral\n\nDashboard de analytics construído com foco em **performance** e **acessibilidade**.\n\n### Destaques\n\n- Gráficos responsivos com D3.js\n- Filtros por período e categoria\n- Dark mode nativo`,
@@ -160,6 +163,13 @@ function normalizeFromSupabaseRow(row: Record<string, unknown>): ProjectRecord {
   const featured =
     typeof row.featured === 'boolean' ? row.featured : true
 
+  const rawRepo =
+    row.repository_url ?? row.repositoryUrl ?? row.github_url ?? row.githubUrl
+  const repositoryUrl =
+    typeof rawRepo === 'string' && rawRepo.trim().length > 0
+      ? rawRepo.trim()
+      : undefined
+
   const createdAt = String(row.created_at ?? row.createdAt ?? new Date().toISOString())
   const updatedAt = String(
     row.updated_at ?? row.updatedAt ?? row.created_at ?? new Date().toISOString(),
@@ -174,6 +184,7 @@ function normalizeFromSupabaseRow(row: Record<string, unknown>): ProjectRecord {
     tags,
     content,
     featured,
+    repositoryUrl,
     createdAt,
     updatedAt,
   }
@@ -232,6 +243,7 @@ export async function createProjectService(
     tags: input.tags,
     content: input.content,
     featured: input.featured ?? false,
+    repositoryUrl: input.repositoryUrl?.trim() || undefined,
     createdAt: now,
     updatedAt: now,
   }
@@ -246,6 +258,7 @@ export async function createProjectService(
         category: newProject.tags[0] || 'Desenvolvimento Web',
         technologies: newProject.tags,
         architecture_details: newProject.content,
+        github_url: newProject.repositoryUrl || null,
         cover_url: newProject.coverImage,
       }
 
@@ -284,6 +297,10 @@ export async function updateProjectService(
     ...existing,
     ...input,
     slug: input.title ? slugify(input.title) : existing.slug,
+    repositoryUrl:
+      input.repositoryUrl !== undefined
+        ? input.repositoryUrl?.trim() || undefined
+        : existing.repositoryUrl,
     updatedAt: new Date().toISOString(),
   }
 
@@ -295,6 +312,7 @@ export async function updateProjectService(
         category: updated.tags[0] || 'Desenvolvimento Web',
         technologies: updated.tags,
         architecture_details: updated.content,
+        github_url: updated.repositoryUrl || null,
         cover_url: updated.coverImage,
       }
 

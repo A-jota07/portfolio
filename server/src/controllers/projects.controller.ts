@@ -17,6 +17,10 @@ const projectInputSchema = z.object({
   tags: z.array(z.string()).default([]),
   content: z.string().default(''),
   featured: z.boolean().optional().default(false),
+  repositoryUrl: z
+    .string()
+    .nullish()
+    .transform((val) => (val && val.trim().length > 0 ? val.trim() : undefined)),
 })
 
 export async function listProjectsHandler(_req: Request, res: Response): Promise<void> {
