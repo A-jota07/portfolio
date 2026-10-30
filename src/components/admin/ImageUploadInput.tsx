@@ -1,5 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { UploadCloud, Link as LinkIcon, X, Check, Loader2, Image as ImageIcon, RefreshCw } from 'lucide-react'
+import React, { useState, useRef } from 'react'
+import {
+  UploadCloud,
+  Link as LinkIcon,
+  X,
+  Check,
+  Loader2,
+  Image as ImageIcon,
+  RefreshCw,
+} from 'lucide-react'
 import { uploadImageFile, resolveImageUrl } from '@/services/uploadService'
 
 interface ImageUploadInputProps {
@@ -13,7 +21,6 @@ export function ImageUploadInput({
   onChange,
   label = 'Imagem de Capa',
 }: ImageUploadInputProps) {
-  // Define o modo inicial com base no valor atual da imagem
   const isExternalUrl = value.startsWith('http://') || value.startsWith('https://')
   const [mode, setMode] = useState<'upload' | 'url'>(isExternalUrl ? 'url' : 'upload')
 
@@ -23,28 +30,21 @@ export function ImageUploadInput({
   const [localPreview, setLocalPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (value && (value.startsWith('http://') || value.startsWith('https://'))) {
-      // Mantém 'url' se for uma imagem de URL externa
-    }
-  }, [value])
-
   const handleFileUpload = async (file: File) => {
     setUploadError(null)
 
-    // Validação básica do tipo de arquivo no lado do cliente
     if (!file.type.startsWith('image/')) {
-      setUploadError('Por favor, selecione um arquivo de imagem válido (.jpg, .png, .webp, etc).')
+      setUploadError(
+        'Por favor, selecione um arquivo de imagem válido (.jpg, .png, .webp, etc).',
+      )
       return
     }
 
-    // Validação do tamanho (máximo 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setUploadError('O arquivo é muito grande. O tamanho máximo permitido é 5MB.')
       return
     }
 
-    // Pré-visualização instantânea local via Blob URL
     const objectUrl = URL.createObjectURL(file)
     setLocalPreview(objectUrl)
 
@@ -54,7 +54,9 @@ export function ImageUploadInput({
       onChange(response.url)
       setUploadError(null)
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Falha ao enviar a imagem para o servidor.')
+      setUploadError(
+        err instanceof Error ? err.message : 'Falha ao enviar a imagem para o servidor.',
+      )
     } finally {
       setIsUploading(false)
     }
@@ -94,30 +96,30 @@ export function ImageUploadInput({
     }
   }
 
-  // URL final para exibição no preview
   const displayUrl = localPreview || (value ? resolveImageUrl(value) : '')
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-surface-700">{label}</label>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <label className="block font-mono text-xs font-medium text-surface-700">
+          {label}
+        </label>
 
-        {/* Toggle / Abas entre Upload e URL Externa */}
-        <div className="inline-flex rounded-lg bg-surface-100 p-0.5 text-xs font-medium">
+        <div className="inline-flex rounded-xl border border-surface-200 bg-surface-100 p-0.5 font-mono text-xs">
           <button
             type="button"
             onClick={() => {
               setMode('upload')
               setUploadError(null)
             }}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
               mode === 'upload'
-                ? 'bg-white text-surface-900 shadow-sm'
-                : 'text-surface-600 hover:text-surface-900'
+                ? 'bg-surface-50 text-surface-900 font-semibold shadow-sm'
+                : 'text-surface-500 hover:text-surface-900'
             }`}
           >
-            <UploadCloud className="h-3.5 w-3.5" />
-            Upload de Arquivo
+            <UploadCloud className="h-3.5 w-3.5 text-accent-400" />
+            Upload
           </button>
           <button
             type="button"
@@ -125,19 +127,18 @@ export function ImageUploadInput({
               setMode('url')
               setUploadError(null)
             }}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all cursor-pointer ${
               mode === 'url'
-                ? 'bg-white text-surface-900 shadow-sm'
-                : 'text-surface-600 hover:text-surface-900'
+                ? 'bg-surface-50 text-surface-900 font-semibold shadow-sm'
+                : 'text-surface-500 hover:text-surface-900'
             }`}
           >
-            <LinkIcon className="h-3.5 w-3.5" />
+            <LinkIcon className="h-3.5 w-3.5 text-accent-400" />
             URL Externa
           </button>
         </div>
       </div>
 
-      {/* Modo 1: Upload de Arquivo Local (Drag and Drop / Button) */}
       {mode === 'upload' && (
         <div>
           <input
@@ -157,29 +158,30 @@ export function ImageUploadInput({
             onClick={() => !isUploading && fileInputRef.current?.click()}
             className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-all cursor-pointer ${
               dragActive
-                ? 'border-accent-500 bg-accent-50/50'
-                : 'border-surface-200 bg-surface-50/50 hover:border-surface-300 hover:bg-surface-100/50'
-            } ${isUploading ? 'opacity-70 pointer-events-none' : ''}`}
+                ? 'border-accent-400 bg-accent-500/10'
+                : 'border-surface-200 bg-surface-50/70 hover:border-accent-400/50 hover:bg-surface-100/50'
+            } ${isUploading ? 'pointer-events-none opacity-70' : ''}`}
           >
             {isUploading ? (
-              <div className="flex flex-col items-center py-2 space-y-2">
-                <Loader2 className="h-8 w-8 animate-spin text-accent-600" />
-                <p className="text-sm font-medium text-surface-700">Enviando imagem para o servidor...</p>
-                <p className="text-xs text-surface-500">Por favor, aguarde.</p>
+              <div className="flex flex-col items-center space-y-2 py-2">
+                <Loader2 className="h-8 w-8 animate-spin text-accent-400" />
+                <p className="text-sm font-medium text-surface-700">
+                  Enviando imagem para o servidor...
+                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center py-2">
-                <div className="mb-3 rounded-full bg-white p-3 shadow-sm border border-surface-200">
-                  <UploadCloud className="h-6 w-6 text-accent-600" />
+                <div className="mb-3 rounded-full border border-surface-200 bg-surface-100 p-3">
+                  <UploadCloud className="h-6 w-6 text-accent-400" />
                 </div>
                 <p className="text-sm font-medium text-surface-800">
-                  Arraste e solte uma imagem aqui, ou{' '}
-                  <span className="text-accent-600 font-semibold underline underline-offset-2">
+                  Arraste uma imagem aqui ou{' '}
+                  <span className="font-semibold text-accent-400 underline underline-offset-2">
                     clique para navegar
                   </span>
                 </p>
-                <p className="mt-1 text-xs text-surface-500">
-                  Suporta JPG, PNG, WebP, GIF ou SVG (máx. 5MB)
+                <p className="mt-1 font-mono text-[11px] text-surface-500">
+                  JPG, PNG, WebP, GIF, SVG ou AVIF (máx. 5MB)
                 </p>
               </div>
             )}
@@ -187,7 +189,6 @@ export function ImageUploadInput({
         </div>
       )}
 
-      {/* Modo 2: URL Externa */}
       {mode === 'url' && (
         <div className="relative">
           <input
@@ -198,44 +199,42 @@ export function ImageUploadInput({
               setLocalPreview(null)
             }}
             placeholder="https://exemplo.com/imagem.jpg"
-            className="w-full rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-accent-400/40"
+            className="w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-2.5 text-sm text-surface-900 outline-none focus:border-accent-400"
           />
         </div>
       )}
 
-      {/* Erros de upload ou validação */}
       {uploadError && (
-        <div className="flex items-center justify-between rounded-lg bg-red-50 p-3 text-xs text-red-700 border border-red-200">
+        <div className="flex items-center justify-between rounded-xl border border-red-500/30 bg-red-500/10 p-3 font-mono text-xs text-red-400">
           <span>{uploadError}</span>
           <button
             type="button"
             onClick={() => setUploadError(null)}
-            className="text-red-500 hover:text-red-700"
+            className="text-red-400 hover:text-red-300 cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       )}
 
-      {/* Visualização Prévia (Preview) da Imagem */}
       {displayUrl && (
-        <div className="relative overflow-hidden rounded-xl border border-surface-200 bg-surface-900/5 p-3">
+        <div className="relative overflow-hidden rounded-xl border border-surface-200 bg-surface-100/50 p-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-surface-600">
-              <ImageIcon className="h-3.5 w-3.5 text-accent-600" />
-              Pré-visualização da imagem
+            <span className="flex items-center gap-1.5 font-mono text-xs text-surface-600">
+              <ImageIcon className="h-3.5 w-3.5 text-accent-400" />
+              Preview
               {value && !isUploading && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
                   <Check className="h-3 w-3" />
                   Pronta
                 </span>
               )}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 font-mono text-xs">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1 text-xs font-medium text-surface-600 hover:text-accent-600"
+                className="flex items-center gap-1 text-surface-600 hover:text-accent-400 cursor-pointer"
               >
                 <RefreshCw className="h-3 w-3" />
                 Trocar
@@ -243,7 +242,7 @@ export function ImageUploadInput({
               <button
                 type="button"
                 onClick={handleClear}
-                className="flex items-center gap-1 text-xs font-medium text-red-600 hover:text-red-700"
+                className="flex items-center gap-1 text-red-400 hover:text-red-300 cursor-pointer"
               >
                 <X className="h-3.5 w-3.5" />
                 Remover
@@ -251,7 +250,7 @@ export function ImageUploadInput({
             </div>
           </div>
 
-          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-surface-200 bg-white">
+          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-surface-200 bg-surface-50">
             <img
               src={displayUrl}
               alt="Pré-visualização"

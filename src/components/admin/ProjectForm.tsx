@@ -49,42 +49,45 @@ export function ProjectForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {formError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 font-mono text-xs text-red-400">
           {formError}
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-4">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="bento-card space-y-4 rounded-2xl p-6">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">Título</label>
+            <label className="mb-1.5 block font-mono text-xs font-medium text-surface-700">
+              Título
+            </label>
             <input
               type="text"
               required
               value={form.title}
               onChange={(e) => updateField('title', e.target.value)}
-              className="w-full rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-accent-400/40"
+              className="w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-2.5 text-sm text-surface-900 outline-none transition-colors focus:border-accent-400"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">Resumo</label>
+            <label className="mb-1.5 block font-mono text-xs font-medium text-surface-700">
+              Resumo
+            </label>
             <textarea
               required
               rows={3}
               value={form.summary}
               onChange={(e) => updateField('summary', e.target.value)}
-              className="w-full rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-accent-400/40"
+              className="w-full rounded-xl border border-surface-200 bg-surface-50 px-4 py-2.5 text-sm text-surface-900 outline-none transition-colors focus:border-accent-400"
             />
           </div>
 
-          {/* Componente flexível de imagem de capa: Upload vs URL */}
           <ImageUploadInput
             value={form.coverImage}
             onChange={(url) => updateField('coverImage', url)}
           />
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">
+            <label className="mb-1.5 block font-mono text-xs font-medium text-surface-700">
               Linguagens e Tecnologias
             </label>
             <TagSelect
@@ -93,30 +96,32 @@ export function ProjectForm({
               placeholder="Buscar ou adicionar tecnologias (ex: React, TypeScript, D3.js)..."
             />
           </div>
-          <label className="flex items-center gap-2 text-sm text-surface-600">
+          <label className="flex items-center gap-2 font-mono text-xs text-surface-600 cursor-pointer">
             <input
               type="checkbox"
               checked={form.featured}
               onChange={(e) => updateField('featured', e.target.checked)}
-              className="rounded border-surface-300"
+              className="rounded border-surface-300 accent-accent-500"
             />
-            Projeto em destaque
+            Projeto em destaque na página inicial
           </label>
         </div>
 
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="text-sm font-medium text-surface-700">Conteúdo Markdown</label>
+        <div className="bento-card rounded-2xl p-6">
+          <div className="mb-3 flex items-center justify-between">
+            <label className="font-mono text-xs font-medium text-surface-700">
+              Conteúdo Markdown
+            </label>
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}
-              className="text-xs font-medium text-accent-600 hover:text-accent-500"
+              className="font-mono text-xs font-semibold text-accent-400 hover:text-accent-300 cursor-pointer"
             >
-              {showPreview ? 'Editar' : 'Preview'}
+              {showPreview ? 'Editar Markdown' : 'Visualizar Preview'}
             </button>
           </div>
           {showPreview ? (
-            <div className="h-[420px] overflow-y-auto rounded-xl border border-surface-200 bg-white p-6">
+            <div className="h-[420px] overflow-y-auto rounded-xl border border-surface-200 bg-surface-50 p-6">
               <MarkdownRenderer content={form.content || '*Nenhum conteúdo ainda.*'} />
             </div>
           ) : (
