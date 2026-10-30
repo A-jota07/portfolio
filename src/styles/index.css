@@ -1,140 +1,431 @@
 @import "tailwindcss";
 
+@property --section-hue-shift {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --cursor-x {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+@property --cursor-y {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 20%;
+}
+
+/* ==========================================================================
+   TOKENS DINÂMICOS EM OKLCH — DEV TERMINAL / IDE
+   ========================================================================== */
+
+:root,
+html.dark {
+  color-scheme: dark;
+
+  /* Superfícies IDE Escuras (padrão) */
+  --surface-50: oklch(0.14 0.018 265);
+  --surface-100: oklch(0.17 0.02 265);
+  --surface-200: oklch(0.23 0.024 265);
+  --surface-300: oklch(0.30 0.026 265);
+  --surface-400: oklch(0.55 0.024 265);
+  --surface-500: oklch(0.68 0.02 265);
+  --surface-600: oklch(0.78 0.016 265);
+  --surface-700: oklch(0.86 0.012 265);
+  --surface-800: oklch(0.93 0.008 265);
+  --surface-900: oklch(0.98 0.004 265);
+
+  --glass-bg: oklch(0.17 0.022 265 / 0.72);
+  --glass-border: oklch(0.95 0.01 265 / 0.09);
+  --grid-line: oklch(0.95 0.01 265 / 0.045);
+
+  --shadow-soft: 0 8px 30px -4px oklch(0.05 0.02 265 / 0.55);
+  --shadow-elevated: 0 20px 50px -8px oklch(0.04 0.02 265 / 0.75);
+}
+
+html.light {
+  color-scheme: light;
+
+  /* Superfícies IDE Claras (Alto Contraste WCAG AA) */
+  --surface-50: oklch(0.98 0.005 265);
+  --surface-100: oklch(0.95 0.008 265);
+  --surface-200: oklch(0.89 0.012 265);
+  --surface-300: oklch(0.82 0.016 265);
+  --surface-400: oklch(0.52 0.022 265);
+  --surface-500: oklch(0.42 0.024 265);
+  --surface-600: oklch(0.34 0.024 265);
+  --surface-700: oklch(0.26 0.024 265);
+  --surface-800: oklch(0.20 0.022 265);
+  --surface-900: oklch(0.14 0.022 265);
+
+  --glass-bg: oklch(0.99 0.003 265 / 0.78);
+  --glass-border: oklch(0.20 0.02 265 / 0.11);
+  --grid-line: oklch(0.20 0.02 265 / 0.055);
+
+  --shadow-soft: 0 6px 24px -4px oklch(0.20 0.02 265 / 0.07);
+  --shadow-elevated: 0 16px 40px -6px oklch(0.18 0.02 265 / 0.12);
+}
+
+/* 5 Paletas de Acento em OKLCH */
+html[data-palette="neon"],
+:root {
+  --palette-hue: 295;
+  --palette-sec-hue: 340;
+  --palette-chroma: 0.23;
+}
+
+html[data-palette="cyan"] {
+  --palette-hue: 210;
+  --palette-sec-hue: 250;
+  --palette-chroma: 0.20;
+}
+
+html[data-palette="matrix"] {
+  --palette-hue: 152;
+  --palette-sec-hue: 178;
+  --palette-chroma: 0.21;
+}
+
+html[data-palette="amber"] {
+  --palette-hue: 55;
+  --palette-sec-hue: 28;
+  --palette-chroma: 0.21;
+}
+
+html[data-palette="magenta"] {
+  --palette-hue: 332;
+  --palette-sec-hue: 285;
+  --palette-chroma: 0.24;
+}
+
+/* Derivação dinâmica de acento + deslocamento suave por seção */
+:root,
+html.dark,
+html.light {
+  --active-hue: calc(var(--palette-hue, 295) + var(--section-hue-shift, 0));
+  --active-sec-hue: calc(var(--palette-sec-hue, 340) + var(--section-hue-shift, 0));
+
+  --accent-300: oklch(0.82 var(--palette-chroma, 0.22) var(--active-hue));
+  --accent-400: oklch(0.74 var(--palette-chroma, 0.22) var(--active-hue));
+  --accent-500: oklch(0.65 var(--palette-chroma, 0.22) var(--active-hue));
+  --accent-600: oklch(0.56 var(--palette-chroma, 0.22) var(--active-hue));
+  --accent-secondary: oklch(0.68 var(--palette-chroma, 0.22) var(--active-sec-hue));
+  --accent-glow: oklch(0.68 var(--palette-chroma, 0.22) var(--active-hue) / 0.24);
+}
+
 @theme {
-  /* Paleta Minimalista & Moderna estilo Gelo/Neve com Contraste Grafite */
-  --color-surface-50: #f8f9fa;   /* Fundo Principal estilo Gelo/Neve Suave */
-  --color-surface-100: #f1f5f9;  /* Superfície secundária super leve */
-  --color-surface-200: #e2e8f0;  /* Borda sutil de elegante contraste */
-  --color-surface-300: #cbd5e1;  /* Borda média / Divisores */
-  --color-surface-400: #94a3b8;  /* Texto discreto / Ícones secundários */
-  --color-surface-500: #64748b;  /* Texto secundário / Descrições */
-  --color-surface-600: #475569;  /* Texto base legível */
-  --color-surface-700: #334155;  /* Títulos médios / Subtítulos */
-  --color-surface-800: #1e293b;  /* Grafite Escuro */
-  --color-surface-900: #0f172a;  /* Preto / Grafite Profundo (Destaque máximo) */
+  --color-surface-50: var(--surface-50);
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+  --color-surface-300: var(--surface-300);
+  --color-surface-400: var(--surface-400);
+  --color-surface-500: var(--surface-500);
+  --color-surface-600: var(--surface-600);
+  --color-surface-700: var(--surface-700);
+  --color-surface-800: var(--surface-800);
+  --color-surface-900: var(--surface-900);
 
-  /* Cores de Acento Sofisticadas */
-  --color-accent-400: #38bdf8;
-  --color-accent-500: #0ea5e9;
-  --color-accent-600: #0284c7;
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-secondary: var(--accent-secondary);
 
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Sombras ultra suaves e profundidade leve */
-  --shadow-soft: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
-  --shadow-elevated: 0 12px 32px -4px rgba(15, 23, 42, 0.08);
+  --shadow-soft: var(--shadow-soft);
+  --shadow-elevated: var(--shadow-elevated);
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    transition: --section-hue-shift 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+      transition: none;
+    }
   }
 
   body {
-    @apply bg-surface-50 text-surface-800 antialiased selection:bg-surface-900 selection:text-white;
+    background-color: var(--surface-50);
+    color: var(--surface-800);
     font-family: var(--font-sans);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection {
+    background-color: var(--accent-500);
+    color: #ffffff;
+  }
+
+  /* Foco visível acessível para navegação por teclado */
+  :focus-visible {
+    outline: 2px solid var(--accent-400);
+    outline-offset: 2px;
   }
 }
 
+/* ==========================================================================
+   UTILITÁRIOS VISUAIS: IDE, BENTO, MESH, SPOTLIGHT & GRAIN
+   ========================================================================== */
+
 @layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .text-fluid-hero {
+    font-size: clamp(2.15rem, 4.5vw + 0.85rem, 4.25rem);
+    line-height: 1.06;
+  }
+
+  .text-fluid-h2 {
+    font-size: clamp(1.65rem, 2.5vw + 0.75rem, 2.65rem);
+    line-height: 1.15;
+  }
+
+  .text-fluid-h3 {
+    font-size: clamp(1.15rem, 1.2vw + 0.65rem, 1.5rem);
+    line-height: 1.25;
+  }
+
   .bg-gradient-calm {
-    background: linear-gradient(
-      135deg,
-      var(--color-surface-50) 0%,
-      var(--color-surface-100) 50%,
-      #e2e8f0 100%
-    );
-  }
-
-  .bg-gradient-subtle {
-    background: linear-gradient(
-      135deg,
-      var(--color-surface-100) 0%,
-      var(--color-surface-200) 100%
-    );
-  }
-
-  .bg-gradient-button {
-    background: linear-gradient(
-      135deg,
-      var(--color-surface-900) 0%,
-      var(--color-surface-800) 100%
-    );
+    background:
+      radial-gradient(
+        750px circle at var(--cursor-x, 50%) var(--cursor-y, 20%),
+        oklch(0.68 var(--palette-chroma, 0.22) var(--active-hue) / 0.08),
+        transparent 65%
+      ),
+      radial-gradient(
+        ellipse 70% 50% at 85% 10%,
+        oklch(0.65 var(--palette-chroma, 0.22) var(--active-sec-hue) / 0.07),
+        transparent 70%
+      ),
+      var(--surface-50);
   }
 
   .bg-gradient-hero {
-    background: radial-gradient(
-        ellipse 80% 60% at 50% -10%,
-        rgba(14, 165, 233, 0.08),
-        transparent
+    background:
+      radial-gradient(
+        ellipse 80% 55% at 50% -10%,
+        oklch(0.68 var(--palette-chroma, 0.22) var(--active-hue) / 0.16),
+        transparent 70%
       ),
-      linear-gradient(180deg, var(--color-surface-50) 0%, var(--color-surface-100) 100%);
+      radial-gradient(
+        ellipse 55% 45% at 85% 30%,
+        oklch(0.65 var(--palette-chroma, 0.22) var(--active-sec-hue) / 0.12),
+        transparent 75%
+      );
+  }
+
+  .bg-ide-grid {
+    background-size: 32px 32px;
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  }
+
+  .bg-ide-dots {
+    background-image: radial-gradient(var(--grid-line) 1.25px, transparent 1.25px);
+    background-size: 22px 22px;
+  }
+
+  .glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+  }
+
+  .bento-card {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-soft);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .bento-card:hover {
+    border-color: oklch(0.72 var(--palette-chroma, 0.22) var(--active-hue) / 0.42);
+    box-shadow:
+      0 0 0 1px oklch(0.72 var(--palette-chroma, 0.22) var(--active-hue) / 0.16),
+      0 16px 40px -12px oklch(0.65 var(--palette-chroma, 0.22) var(--active-hue) / 0.22);
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, var(--color-surface-900) 0%, var(--color-surface-600) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--accent-400) 0%,
+      var(--accent-secondary) 60%,
+      var(--accent-300) 100%
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
+
+  .bg-accent-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--accent-500) 0%,
+      var(--accent-secondary) 100%
+    );
+  }
+
+  .border-glow {
+    box-shadow: 0 0 24px -4px var(--accent-glow);
+  }
 }
 
-/* Syntax highlight */
+/* Ruído/Grain sutil sobre o fundo sem bloquear cliques */
+.noise-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================================
+   MARKDOWN EDITORIAL & SYNTAX HIGHLIGHT
+   ========================================================================== */
+
 .hljs {
-  @apply rounded-xl bg-surface-900 text-surface-100;
+  border-radius: 0.75rem;
+  background: oklch(0.13 0.02 265) !important;
+  color: oklch(0.92 0.01 265) !important;
+  padding: 1.25rem !important;
 }
 
 .markdown-body h1 {
-  @apply mb-4 mt-8 text-3xl font-bold tracking-tight text-surface-900;
+  font-family: var(--font-display);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--surface-900);
+  scroll-margin-top: 6rem;
 }
 
 .markdown-body h2 {
-  @apply mb-3 mt-6 text-2xl font-semibold text-surface-900;
+  font-family: var(--font-display);
+  margin-top: 2rem;
+  margin-bottom: 0.85rem;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--surface-900);
+  border-bottom: 1px solid var(--surface-200);
+  padding-bottom: 0.5rem;
+  scroll-margin-top: 6rem;
 }
 
 .markdown-body h3 {
-  @apply mb-2 mt-4 text-xl font-medium text-surface-800;
+  font-family: var(--font-display);
+  margin-top: 1.5rem;
+  margin-bottom: 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--surface-800);
+  scroll-margin-top: 6rem;
 }
 
 .markdown-body p {
-  @apply mb-4 leading-relaxed text-surface-600;
+  margin-bottom: 1.15rem;
+  line-height: 1.75;
+  color: var(--surface-600);
 }
 
 .markdown-body ul,
 .markdown-body ol {
-  @apply mb-4 ml-6 list-disc space-y-1 text-surface-600;
+  margin-bottom: 1.25rem;
+  margin-left: 1.5rem;
+  list-style-type: disc;
+  color: var(--surface-600);
+}
+
+.markdown-body li {
+  margin-bottom: 0.35rem;
+  line-height: 1.7;
 }
 
 .markdown-body a {
-  @apply text-surface-900 font-medium underline decoration-surface-300 underline-offset-2 transition-colors hover:text-accent-600;
+  color: var(--accent-400);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.markdown-body a:hover {
+  color: var(--accent-300);
 }
 
 .markdown-body img {
-  @apply my-6 w-full rounded-2xl border border-surface-200 shadow-soft;
+  margin: 1.75rem 0;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--surface-200);
+  box-shadow: var(--shadow-soft);
 }
 
 .markdown-body pre {
-  @apply my-4 overflow-x-auto rounded-xl border border-surface-800;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  border-radius: 0.85rem;
+  border: 1px solid var(--surface-200);
+  background: oklch(0.13 0.02 265);
 }
 
 .markdown-body code:not(pre code) {
-  @apply rounded bg-surface-100 px-1.5 py-0.5 font-mono text-sm text-surface-800 border border-surface-200;
+  border-radius: 0.375rem;
+  background: var(--surface-100);
+  padding: 0.15rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--accent-400);
+  border: 1px solid var(--surface-200);
 }
 
 .markdown-body blockquote {
-  @apply my-4 border-l-4 border-surface-900 pl-4 italic text-surface-500;
+  margin: 1.25rem 0;
+  border-left: 3px solid var(--accent-500);
+  background: var(--surface-100);
+  padding: 0.85rem 1.25rem;
+  border-radius: 0 0.75rem 0.75rem 0;
+  font-style: italic;
+  color: var(--surface-600);
 }
 
 .markdown-body table {
-  @apply my-4 w-full border-collapse text-sm;
+  margin: 1.25rem 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
 }
 
 .markdown-body th,
 .markdown-body td {
-  @apply border border-surface-200 px-3 py-2;
+  border: 1px solid var(--surface-200);
+  padding: 0.6rem 0.85rem;
 }
 
 .markdown-body th {
-  @apply bg-surface-100 font-medium text-surface-900;
+  background: var(--surface-100);
+  font-weight: 600;
+  color: var(--surface-900);
 }
