@@ -76,12 +76,13 @@ temp/
 .parcel-cache/
 
 # =============================================================================
-# Banco de dados local (SQLite, etc.)
+# Banco de dados local (SQLite, JSON persistente do servidor, etc.)
 # =============================================================================
 *.db
 *.db-journal
 *.sqlite
 *.sqlite3
+server/data/
 
 # =============================================================================
 # Deployments e plataformas (Vercel, Netlify, Serverless)

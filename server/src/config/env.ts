@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3001),
-  CORS_ORIGIN: z.string().url(),
+  CORS_ORIGIN: z.string().url().default('http://localhost:5173'),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET deve ter no mínimo 32 caracteres'),
   JWT_EXPIRES_IN: z.string().default('8h'),
   JWT_ISSUER: z.string().default('portfolio-api'),
@@ -19,6 +19,11 @@ const envSchema = z.object({
   ADMIN_PASSWORD_HASH: z.string().startsWith('$2'),
   LOGIN_RATE_LIMIT_WINDOW_MS: z.coerce.number().default(900_000),
   LOGIN_RATE_LIMIT_MAX: z.coerce.number().default(5),
+  SUPABASE_URL: z.string().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  SUPABASE_ANON_KEY: z.string().optional(),
+  VITE_SUPABASE_URL: z.string().optional(),
+  VITE_SUPABASE_ANON_KEY: z.string().optional(),
 })
 
 export const env = envSchema.parse(process.env)

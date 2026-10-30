@@ -9,14 +9,19 @@ import {
 } from 'react'
 import type { Project, ProjectInput } from '@/types/project'
 import * as projectService from '@/services/projectService'
+import { subscribeToProjectsRealtime } from '@/services/supabaseClient'
 import { SEED_PROJECTS } from '@/data/seedProjects'
+
+export type SyncSource = 'supabase' | 'backend' | 'local'
 
 interface ProjectsContextValue {
   projects: Project[]
-  refresh: () => void
-  createProject: (input: ProjectInput) => Project
-  updateProject: (id: string, input: Partial<ProjectInput>) => Project | null
-  deleteProject: (id: string) => boolean
+  isSyncing: boolean
+  syncSource: SyncSource
+  refresh: () => Promise<void>
+  createProject: (input: ProjectInput) => Promise<Project>
+  updateProject: (id: string, input: Partial<ProjectInput>) => Promise<Project | null>
+  deleteProject: (id: string) => Promise<boolean>
   getBySlug: (slug: string) => Project | undefined
   getById: (id: string) => Project | undefined
 }
@@ -24,40 +29,89 @@ interface ProjectsContextValue {
 const ProjectsContext = createContext<ProjectsContextValue | null>(null)
 
 export function ProjectsProvider({ children }: { children: ReactNode }) {
-  const [projects, setProjects] = useState<Project[]>([])
-
-  const refresh = useCallback(() => {
+  const [projects, setProjects] = useState<Project[]>(() => {
     projectService.seedProjectsIfEmpty(SEED_PROJECTS)
-    setProjects(projectService.getAllProjects())
+    return projectService.getAllProjects()
+  })
+  const [isSyncing, setIsSyncing] = useState<boolean>(true)
+  const [syncSource, setSyncSource] = useState<SyncSource>('local')
+
+  const refresh = useCallback(async () => {
+    setIsSyncing(true)
+    const remote = await projectService.fetchRemoteProjects()
+    if (remote.projects) {
+      setProjects(remote.projects)
+      setSyncSource(remote.source)
+    } else {
+      projectService.seedProjectsIfEmpty(SEED_PROJECTS)
+      setProjects(projectService.getAllProjects())
+      setSyncSource('local')
+    }
+    setIsSyncing(false)
   }, [])
 
   useEffect(() => {
-    refresh()
+    void refresh()
+
+    // Escuta alterações em tempo real vindas do Supabase (quando configurado)
+    const unsubscribeRealtime = subscribeToProjectsRealtime(() => {
+      void refresh()
+    })
+
+    // Sincroniza automaticamente quando a aba do navegador volta a ganhar foco
+    const handleFocus = () => {
+      void refresh()
+    }
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      unsubscribeRealtime()
+      window.removeEventListener('focus', handleFocus)
+    }
   }, [refresh])
+
+  const getBySlug = useCallback(
+    (slug: string) => {
+      return projects.find((p) => p.slug === slug) ?? projectService.getProjectBySlug(slug)
+    },
+    [projects],
+  )
+
+  const getById = useCallback(
+    (id: string) => {
+      return projects.find((p) => p.id === id) ?? projectService.getProjectById(id)
+    },
+    [projects],
+  )
 
   const value = useMemo(
     () => ({
       projects,
+      isSyncing,
+      syncSource,
       refresh,
-      createProject: (input: ProjectInput) => {
-        const created = projectService.createProject(input)
-        refresh()
+      createProject: async (input: ProjectInput) => {
+        setIsSyncing(true)
+        const created = await projectService.createProjectRemote(input)
+        await refresh()
         return created
       },
-      updateProject: (id: string, input: Partial<ProjectInput>) => {
-        const updated = projectService.updateProject(id, input)
-        refresh()
+      updateProject: async (id: string, input: Partial<ProjectInput>) => {
+        setIsSyncing(true)
+        const updated = await projectService.updateProjectRemote(id, input)
+        await refresh()
         return updated
       },
-      deleteProject: (id: string) => {
-        const deleted = projectService.deleteProject(id)
-        if (deleted) refresh()
+      deleteProject: async (id: string) => {
+        setIsSyncing(true)
+        const deleted = await projectService.deleteProjectRemote(id)
+        await refresh()
         return deleted
       },
-      getBySlug: projectService.getProjectBySlug,
-      getById: projectService.getProjectById,
+      getBySlug,
+      getById,
     }),
-    [projects, refresh],
+    [projects, isSyncing, syncSource, refresh, getBySlug, getById],
   )
 
   return <ProjectsContext.Provider value={value}>{children}</ProjectsContext.Provider>

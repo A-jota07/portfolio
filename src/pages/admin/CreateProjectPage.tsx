@@ -8,16 +8,19 @@ export function CreateProjectPage() {
 
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-semibold text-surface-900">Novo Projeto</h1>
+      <p className="mb-1 font-mono text-xs text-accent-400">// novo_registro_remoto</p>
+      <h1 className="font-display mb-2 text-2xl font-bold text-surface-900">
+        Novo Projeto
+      </h1>
       <p className="mb-8 text-sm text-surface-500">
-        Escreva o conteúdo em Markdown com suporte a código e imagens.
+        Ao salvar, o projeto é enviado automaticamente para o backend/Supabase e publicado no site em tempo real.
       </p>
       <ProjectForm
-        onSubmit={(data) => {
-          const project = createProject(data)
+        onSubmit={async (data) => {
+          const project = await createProject(data)
           navigate(`/admin/editar/${project.id}`)
         }}
-        submitLabel="Criar Projeto"
+        submitLabel="Criar e Publicar Projeto"
       />
     </div>
   )

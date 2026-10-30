@@ -8,7 +8,7 @@ import { ImageUploadInput } from './ImageUploadInput'
 
 interface ProjectFormProps {
   initialData?: Partial<ProjectInput>
-  onSubmit: (data: ProjectInput) => void
+  onSubmit: (data: ProjectInput) => void | Promise<void>
   submitLabel?: string
 }
 
@@ -29,17 +29,29 @@ export function ProjectForm({
   const [form, setForm] = useState<ProjectInput>({ ...emptyForm, ...initialData })
   const [showPreview, setShowPreview] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormError(null)
 
     if (!form.coverImage) {
-      setFormError('Por favor, faça o upload de uma imagem de capa ou informe uma URL externa.')
+      setFormError(
+        'Por favor, faça o upload de uma imagem de capa ou informe uma URL externa.',
+      )
       return
     }
 
-    onSubmit(form)
+    setIsSaving(true)
+    try {
+      await onSubmit(form)
+    } catch (err) {
+      setFormError(
+        err instanceof Error ? err.message : 'Erro ao sincronizar projeto com o servidor.',
+      )
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const updateField = <K extends keyof ProjectInput>(key: K, value: ProjectInput[K]) => {
@@ -135,7 +147,9 @@ export function ProjectForm({
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit">{submitLabel}</Button>
+        <Button type="submit" isLoading={isSaving}>
+          {submitLabel}
+        </Button>
       </div>
     </form>
   )

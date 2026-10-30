@@ -22,9 +22,12 @@ export function EditProjectPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-surface-900">Editar Projeto</h1>
+          <p className="mb-1 font-mono text-xs text-accent-400">// editar_registro</p>
+          <h1 className="font-display text-2xl font-bold text-surface-900">
+            Editar Projeto
+          </h1>
           <p className="mt-1 text-sm text-surface-500">{project.title}</p>
         </div>
         <Link to={`/portfolio/${project.slug}`} target="_blank">
@@ -40,11 +43,11 @@ export function EditProjectPage() {
           content: project.content,
           featured: project.featured,
         }}
-        onSubmit={(data) => {
-          updateProject(project.id, data)
+        onSubmit={async (data) => {
+          await updateProject(project.id, data)
           navigate('/admin')
         }}
-        submitLabel="Salvar Alterações"
+        submitLabel="Salvar e Sincronizar"
       />
     </div>
   )
