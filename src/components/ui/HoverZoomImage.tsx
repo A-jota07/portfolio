@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { resolveImageUrl } from '@/services/uploadService'
 
 interface HoverZoomImageProps {
@@ -15,18 +15,20 @@ export function HoverZoomImage({
   aspectRatio = 'aspect-[16/10]',
 }: HoverZoomImageProps) {
   const resolvedSrc = resolveImageUrl(src)
+  const prefersReducedMotion = Boolean(useReducedMotion())
 
   return (
-    <div className={`relative overflow-hidden ${aspectRatio} ${className}`}>
+    <div className={`relative overflow-hidden bg-surface-100 ${aspectRatio} ${className}`}>
       <motion.img
         src={resolvedSrc}
         alt={alt}
         loading="lazy"
+        decoding="async"
         className="h-full w-full object-cover"
-        whileHover={{ scale: 1.08 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        whileHover={prefersReducedMotion ? undefined : { scale: 1.06 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface-900/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface-50/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
     </div>
   )
 }
