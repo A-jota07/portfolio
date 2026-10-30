@@ -1,11 +1,68 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark" data-palette="neon">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Portfólio pessoal — projetos, experiência e contato." />
-    <title>Portfólio</title>
+    <meta
+      name="description"
+      content="Alexandre Cássio de Souza Junior — Engenheiro Full Stack Júnior (Rondonópolis-MT, Remoto). Desenvolvimento de aplicações web em React, TypeScript, Node.js e Java."
+    />
+    <meta name="author" content="Alexandre Cássio de Souza Junior" />
+    <meta name="theme-color" content="#0b0c12" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content="Alexandre Junior | Engenheiro Full Stack — Portfólio IDE" />
+    <meta
+      property="og:description"
+      content="Portfólio interativo em formato Dev Terminal / IDE — projetos em produção, arquitetura Full Stack, React, TypeScript, Node.js e Java."
+    />
+    <meta property="og:url" content="https://alexandre-jr.vercel.app" />
+    <meta property="og:image" content="https://alexandre-jr.vercel.app/fotoHome.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Alexandre Junior | Engenheiro Full Stack" />
+    <meta
+      name="twitter:description"
+      content="Desenvolvedor Full Stack especializado em React, TypeScript, Node.js e Java. Disponível para trabalho remoto."
+    />
+    <meta name="twitter:image" content="https://alexandre-jr.vercel.app/fotoHome.png" />
+
+    <!-- Google Fonts: Space Grotesk, Inter, JetBrains Mono (swap) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Alexandre Junior | Engenheiro Full Stack — ~/portfolio</title>
+
+    <!-- Pre-hydration theme & palette script to avoid FOUC -->
+    <script>
+      ;(function () {
+        try {
+          var root = document.documentElement
+          var storedMode = localStorage.getItem('portfolio_theme_mode')
+          var storedPalette = localStorage.getItem('portfolio_theme_palette') || 'neon'
+          var prefersLight =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+
+          var mode = storedMode === 'light' || storedMode === 'dark' ? storedMode : prefersLight ? 'light' : 'dark'
+          if (!storedMode) {
+            mode = 'dark' // Escuro como padrão principal
+          }
+
+          root.classList.remove('light', 'dark')
+          root.classList.add(mode)
+          root.setAttribute('data-theme', mode)
+          root.setAttribute('data-palette', storedPalette)
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
