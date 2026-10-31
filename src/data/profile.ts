@@ -29,7 +29,7 @@ export const PROFILE_DATA = {
   rotatingRoles: [
     'Engenheiro Full Stack Júnior',
     'Especialista em React & TypeScript',
-    'Desenvolvedor de APIs Node.js & Java',
+    'Desenvolvedor de APIs Node.js & Python',
     'Criador de Interfaces de Alta Performance',
   ],
   location: 'Rondonópolis - MT',
@@ -42,7 +42,7 @@ export const PROFILE_DATA = {
   bioShort:
     'Engenheiro Full Stack Júnior e estudante de Ciência da Computação focado em arquitetar aplicações web modernas, escaláveis e com experiência de usuário refinada.',
   bioExtended:
-    'Atuo do desenho da interface reativa em React, TypeScript e Vue até a modelagem de APIs robustas em Node.js e Java. Acredito que código limpo, performance perceptível e atenção obsessiva aos microdetalhes visuais são o que diferenciam um produto memorável.',
+    'Atuo do desenho da interface reativa em React, TypeScript e Vue até a modelagem de APIs robustas em Node.js e Python. Acredito que código limpo, performance perceptível e atenção obsessiva aos microdetalhes visuais são o que diferenciam um produto memorável.',
   philosophy: [
     {
       code: '// 01. interface_como_engenharia',
@@ -107,11 +107,25 @@ export const PROFILE_DATA = {
       description: 'APIs RESTful, autenticação JWT, middlewares de segurança (Helmet, CORS, Rate Limit) e upload.',
     },
     {
-      name: 'Java & Spring Boot',
+      name: 'Python & Automação / APIs',
       category: 'Back-end',
-      level: 80,
+      level: 85,
+      tagKey: 'Python',
+      description: 'Desenvolvimento de scripts, automações, manipulação de dados, algoritmos e criação de APIs.',
+    },
+    {
+      name: 'Java (Fundamentos & POO)',
+      category: 'Back-end',
+      level: 55,
       tagKey: 'Java',
-      description: 'Programação orientada a objetos, APIs corporativas, JPA/Hibernate e padrões de projeto.',
+      description: 'Fundamentos da linguagem, orientação a objetos, coleções e lógica básica de backend.',
+    },
+    {
+      name: 'Linguagem C (Sistemas & Memória)',
+      category: 'Back-end',
+      level: 52,
+      tagKey: 'C',
+      description: 'Estudos de ponteiros, alocação dinâmica, manipulação de memória e estruturas de dados.',
     },
     {
       name: 'Validação & Segurança (Zod / JWT / Bcrypt)',
@@ -172,15 +186,16 @@ export const PROFILE_DATA = {
         'Base sólida em estruturas de dados, complexidade de algoritmos, engenharia de software, bancos de dados relacionais e arquitetura de sistemas.',
       highlights: [
         'Desenvolvimento de projetos práticos em Python, Node.js, TypeScript e bancos SQL',
+        'Estudo de estruturas de dados e memória com C, além de introdução e POO em Java',
         'Foco em boas práticas de engenharia de software, testes e padrões de projeto',
       ],
     },
   ] satisfies TimelineItem[],
   studyingNow: [
     {
-      topic: 'Arquitetura Escalável & Testes Automatizados',
-      focus: 'Vitest, Playwright e padrões Clean Architecture em Node.js/TypeScript',
-      status: 'em_progresso',
+      topic: 'Fundamentos em C & Java (Início)',
+      focus: 'Ponteiros e alocação em C, introdução a POO em Java e estruturas de dados',
+      status: 'iniciando',
     },
     {
       topic: 'Performance Web & Core Web Vitals',
@@ -188,8 +203,8 @@ export const PROFILE_DATA = {
       status: 'aprofundando',
     },
     {
-      topic: 'Ecossistema Java & Microsserviços',
-      focus: 'Spring Boot 3, segurança OAuth2/JWT, mensageria e containers Docker',
+      topic: 'Ecossistema Python & Microsserviços',
+      focus: 'FastAPI, scripts de automação, processamento de dados e containers Docker',
       status: 'praticando',
     },
   ] satisfies StudyingItem[],

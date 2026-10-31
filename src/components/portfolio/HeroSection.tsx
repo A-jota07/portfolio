@@ -390,7 +390,7 @@ export function HeroSection({ publishedProjectsCount }: HeroSectionProps) {
                     <span className="select-none text-surface-400">06</span>
                     <span className="pl-4">
                       backEnd:{' '}
-                      <span className="text-accent-300">['Node.js', 'Java', 'PostgreSQL']</span>,
+                      <span className="text-accent-300">['Node.js', 'Python', 'PostgreSQL']</span>,
                     </span>
                   </div>
                   <div className="flex gap-3">

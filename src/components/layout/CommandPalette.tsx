@@ -218,7 +218,7 @@ export function CommandPalette() {
       setTerminalOutput([
         '$ cat ~/portfolio/skills.json',
         'Front-end : React 19, TypeScript, Tailwind CSS v4, Framer Motion, Vue.js',
-        'Back-end  : Node.js, Express 5, Java, Spring Boot, JWT, Zod',
+        'Back-end  : Node.js, Express 5, Python, C, Java (Iniciando), JWT, Zod',
         'Database  : PostgreSQL, SQL, Docker, Git, Deploy Vercel & Render',
       ])
     } else if (trimmed === 'contato' || trimmed === 'hire') {

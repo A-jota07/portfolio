@@ -116,6 +116,9 @@ const techIcons: Record<string, React.ReactNode> = {
   rust: (
     <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#000000] text-[8px] font-black text-[#E16E0A] leading-none font-sans select-none">RUST</div>
   ),
+  c: (
+    <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#A8B9CC] text-[8px] font-black text-[#1C2C3E] leading-none font-sans select-none">C</div>
+  ),
   cpp: (
     <div className="flex h-3.5 w-3.5 items-center justify-center rounded bg-[#00599C] text-[8px] font-black text-white leading-none font-sans select-none">C++</div>
   ),
@@ -238,6 +241,7 @@ const normalizedKeys: Record<string, string> = {
   gql: 'graphql',
   redux: 'redux',
   java: 'java',
+  c: 'c',
   go: 'go',
   golang: 'go',
   rust: 'rust',
@@ -305,6 +309,7 @@ export const PREDEFINED_TECHS = [
   'GraphQL',
   'Redux',
   'Java',
+  'C',
   'Go',
   'Rust',
   'C++',
