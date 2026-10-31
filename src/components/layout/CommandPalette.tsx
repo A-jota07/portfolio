@@ -227,7 +227,7 @@ export function CommandPalette() {
         `E-mail   : ${PROFILE_DATA.email}`,
         `LinkedIn : ${PROFILE_DATA.linkedinUrl}`,
         `GitHub   : ${PROFILE_DATA.githubUrl}`,
-        'Status   : Pronto para início imediato (Remoto).',
+        'Status   : Pronto para início imediato.',
       ])
     } else if (trimmed === 'clear') {
       setQuery('')

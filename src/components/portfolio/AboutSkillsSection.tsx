@@ -149,7 +149,7 @@ export function AboutSkillsSection() {
               </div>
 
               <h3 className="font-display text-fluid-h3 mb-3 font-bold text-surface-900">
-                De {PROFILE_DATA.location} para projetos remotos de alto nível
+                De {PROFILE_DATA.location} para projetos de alto nível
               </h3>
 
               <p className="mb-4 text-sm leading-relaxed text-surface-600 sm:text-base">

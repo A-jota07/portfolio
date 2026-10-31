@@ -33,7 +33,7 @@ export const PROFILE_DATA = {
     'Criador de Interfaces de Alta Performance',
   ],
   location: 'Rondonópolis - MT',
-  availability: 'Disponível para trabalho remoto',
+  availability: 'Disponível para trabalho',
   yearsOfExperience: 2,
   repositoriesCount: 25,
   email: 'alexandrecassiodesouzajunior@gmail.com',
@@ -153,7 +153,7 @@ export const PROFILE_DATA = {
     {
       period: '2024 — Presente',
       role: 'Desenvolvedor Full Stack (Projetos em Produção & Freelance)',
-      organization: 'Atuação Independente · Remoto',
+      organization: 'Atuação Independente · Remoto e presencial',
       location: 'Rondonópolis - MT',
       description:
         'Desenvolvimento completo de aplicações web modernas, desde a concepção de interfaces até o deploy de APIs autenticadas em nuvem.',
@@ -171,7 +171,7 @@ export const PROFILE_DATA = {
       description:
         'Base sólida em estruturas de dados, complexidade de algoritmos, engenharia de software, bancos de dados relacionais e arquitetura de sistemas.',
       highlights: [
-        'Desenvolvimento de projetos práticos em Java, Node.js, TypeScript e bancos SQL',
+        'Desenvolvimento de projetos práticos em Python, Node.js, TypeScript e bancos SQL',
         'Foco em boas práticas de engenharia de software, testes e padrões de projeto',
       ],
     },
