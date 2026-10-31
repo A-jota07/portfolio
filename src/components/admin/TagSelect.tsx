@@ -406,13 +406,13 @@ export function TagSelect({ selectedTags, onChange, placeholder = 'Buscar ou adi
     <div ref={containerRef} className="relative w-full">
       <div
         onClick={() => inputRef.current?.focus()}
-        className="flex w-full flex-wrap gap-2 rounded-xl border border-surface-200 bg-white p-2 text-sm outline-none transition-all focus-within:border-accent-500 focus-within:ring-2 focus-within:ring-accent-400/30 cursor-text min-h-[46px] items-center"
+        className="flex w-full flex-wrap gap-2 rounded-xl border border-surface-200 bg-surface-50 p-2 text-sm outline-none transition-all focus-within:border-accent-400 cursor-text min-h-[46px] items-center"
       >
         {/* Selected tags */}
         {selectedTags.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1.5 rounded-full bg-surface-100 px-3 py-1 text-xs font-semibold text-surface-700 border border-surface-200 animate-fade-in"
+            className="flex items-center gap-1.5 rounded-lg bg-surface-100 px-3 py-1 font-mono text-xs font-semibold text-surface-800 border border-surface-200"
           >
             {getTechIcon(tag)}
             <span>{tag}</span>
@@ -422,7 +422,7 @@ export function TagSelect({ selectedTags, onChange, placeholder = 'Buscar ou adi
                 e.stopPropagation()
                 handleRemove(tag)
               }}
-              className="text-surface-400 hover:text-surface-600 transition-colors"
+              className="text-surface-400 hover:text-surface-800 transition-colors cursor-pointer"
             >
               <X className="h-3 w-3" />
             </button>
@@ -443,20 +443,20 @@ export function TagSelect({ selectedTags, onChange, placeholder = 'Buscar ou adi
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder={selectedTags.length === 0 ? placeholder : ''}
-            className="w-full bg-transparent border-none outline-none py-1 text-surface-800 placeholder-surface-400 focus:ring-0 text-sm"
+            className="w-full bg-transparent border-none outline-none py-1 text-surface-900 placeholder-surface-400 focus:ring-0 text-sm"
           />
         </div>
       </div>
 
       {/* Floating Dropdown suggestions */}
-      {isOpen && (isOpen && (filteredOptions.length > 0 || showCreateOption)) && (
-        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-surface-200 bg-white py-1 shadow-elevated focus:outline-none animate-fade-in-up">
+      {isOpen && (filteredOptions.length > 0 || showCreateOption) && (
+        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-surface-200 bg-surface-100 py-1 shadow-elevated focus:outline-none">
           {filteredOptions.map((option) => (
             <button
               key={option}
               type="button"
               onClick={() => handleSelect(option)}
-              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-surface-700 hover:bg-surface-50 hover:text-surface-900 transition-colors"
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-surface-700 hover:bg-surface-200/70 hover:text-surface-900 transition-colors cursor-pointer"
             >
               {getTechIcon(option)}
               <span className="flex-1">{option}</span>
@@ -467,9 +467,9 @@ export function TagSelect({ selectedTags, onChange, placeholder = 'Buscar ou adi
             <button
               type="button"
               onClick={() => handleSelect(query)}
-              className="flex w-full items-center gap-2 border-t border-surface-100 px-4 py-2.5 text-left text-sm text-accent-600 hover:bg-surface-50 transition-colors font-medium"
+              className="flex w-full items-center gap-2 border-t border-surface-200 px-4 py-2.5 text-left text-sm text-accent-400 hover:bg-surface-200/70 transition-colors font-medium cursor-pointer"
             >
-              <Code className="h-3.5 w-3.5 text-accent-500" />
+              <Code className="h-3.5 w-3.5 text-accent-400" />
               <span>Adicionar "{query}" como nova tag</span>
             </button>
           )}

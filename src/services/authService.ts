@@ -1,10 +1,9 @@
 import type { AuthUser, LoginCredentials, LoginResponse } from '@/types/auth'
+import { supabaseClient } from './supabaseClient'
 
 const TOKEN_KEY = 'portfolio_auth_token'
 
-// 1. Pegamos a URL da Render vinda da Vercel. Se estiver rodando local, usa fallback.
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-// 2. Definimos o prefixo global da sua API (/api)
+const BASE_URL = import.meta.env.VITE_API_URL || ''
 const API_BASE = `${BASE_URL}/api`
 
 function getStoredToken(): string | null {
@@ -31,7 +30,6 @@ async function fetchWithAuth<T>(path: string, options: RequestInit = {}): Promis
     headers.set('Content-Type', 'application/json')
   }
 
-  // Aqui ele vai montar: https://sua-api.onrender.com/api + /auth/login
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
@@ -48,6 +46,7 @@ async function fetchWithAuth<T>(path: string, options: RequestInit = {}): Promis
 export async function login(
   credentials: LoginCredentials,
 ): Promise<{ success: boolean; error?: string }> {
+  // 1. Tenta autenticar no Backend Express (JWT)
   try {
     const data = await fetchWithAuth<LoginResponse>('/auth/login', {
       method: 'POST',
@@ -56,16 +55,36 @@ export async function login(
 
     setStoredToken(data.accessToken)
     return { success: true }
-  } catch (error) {
+  } catch (backendErr) {
+    // 2. Se o Supabase Auth estiver configurado diretamente, permite login via Supabase Auth como fallback
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: credentials.email,
+          password: credentials.password,
+        })
+        if (!error && data.session?.access_token) {
+          setStoredToken(data.session.access_token)
+          return { success: true }
+        }
+      } catch {
+        // Segue para erro padrão
+      }
+    }
+
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Credenciais inválidas.',
+      error:
+        backendErr instanceof Error ? backendErr.message : 'Credenciais inválidas.',
     }
   }
 }
 
 export function logout(): void {
   removeStoredToken()
+  if (supabaseClient) {
+    void supabaseClient.auth.signOut()
+  }
 }
 
 export async function fetchCurrentUser(): Promise<AuthUser | null> {
@@ -75,6 +94,22 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
   try {
     return await fetchWithAuth<AuthUser>('/auth/me')
   } catch {
+    if (supabaseClient) {
+      try {
+        const { data } = await supabaseClient.auth.getUser()
+        if (data.user?.email) {
+          return {
+            email: data.user.email,
+            name:
+              (data.user.user_metadata?.displayName as string | undefined) ||
+              'Administrador',
+            role: 'admin',
+          }
+        }
+      } catch {
+        // Ignora
+      }
+    }
     removeStoredToken()
     return null
   }

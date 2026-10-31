@@ -9,6 +9,7 @@ export const SEED_PROJECTS: Project[] = [
     coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
     tags: ['React', 'TypeScript', 'D3.js'],
     featured: true,
+    repositoryUrl: 'https://github.com/A-jota07/portfolio',
     createdAt: '2025-11-01T10:00:00.000Z',
     updatedAt: '2025-11-01T10:00:00.000Z',
     content: `## Visão Geral

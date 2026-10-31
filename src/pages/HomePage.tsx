@@ -1,184 +1,197 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, type Variants } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { ArrowRight, FolderGit2, Send } from 'lucide-react'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Button } from '@/components/ui/Button'
 import { ProjectCard } from '@/components/portfolio/ProjectCard'
+import { HeroSection } from '@/components/portfolio/HeroSection'
+import { AboutSkillsSection } from '@/components/portfolio/AboutSkillsSection'
 import { useProjects } from '@/context/ProjectsContext'
-
-const socialLinks = [
-  {
-    label: 'GitHub',
-    href: 'https://github.com/A-jota07',
-    icon: (
-      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-      </svg>
-    ),
-  },
-  {
-    label: 'LinkedIn',
-    href: 'https://linkedin.com/in/alexandre-c-souza-jr',
-    icon: (
-      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 114.126 0 2.065 2.065 0 01-2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-      </svg>
-    ),
-  },
-  {
-    label: 'E-mail',
-    href: 'mailto:alexandrecassiodesouzajunior@gmail.com',
-    icon: (
-      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-  },
-]
-
-// Variantes com tipagem estrita para o Framer Motion
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
-  },
-}
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: 'easeOut' },
-  },
-}
-
-const imageVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.94, y: 20 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: 'easeOut', delay: 0.25 },
-  },
-}
+import { useTheme } from '@/context/ThemeContext'
+import { PROFILE_DATA } from '@/data/profile'
 
 export function HomePage() {
   const { projects } = useProjects()
-  const featured = projects.filter((p) => p.featured).slice(0, 3)
+  const { setActiveSection } = useTheme()
+  const prefersReducedMotion = Boolean(useReducedMotion())
+  const [selectedTag, setSelectedTag] = useState<string>('Todos')
+
+  // Categorias dinâmicas derivadas das tags reais cadastradas nos projetos
+  const projectTags = useMemo(() => {
+    const tagSet = new Set<string>()
+    projects.forEach((p) => {
+      p.tags.forEach((t) => tagSet.add(t))
+    })
+    return ['Todos', ...Array.from(tagSet)]
+  }, [projects])
+
+  const displayedProjects = useMemo(() => {
+    const base =
+      selectedTag === 'Todos'
+        ? projects
+        : projects.filter((p) => p.tags.includes(selectedTag))
+
+    const featuredFirst = [...base].sort(
+      (a, b) => Number(b.featured) - Number(a.featured),
+    )
+    return featuredFirst.slice(0, 6)
+  }, [projects, selectedTag])
+
+  // IntersectionObserver para transicionar o matiz de cor conforme a seção visível
+  useEffect(() => {
+    const sections = document.querySelectorAll<HTMLElement>('[data-section]')
+    if (sections.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('data-section')
+            if (id) setActiveSection(id)
+          }
+        })
+      },
+      { threshold: 0.35 },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [setActiveSection])
 
   return (
     <>
-      <section className="bg-gradient-hero border-b border-surface-200/60 px-6 py-20 md:py-28 overflow-hidden">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
-          {/* Textos e Botões com entrada em sequência (stagger) */}
+      <HeroSection publishedProjectsCount={projects.length} />
+
+      <AboutSkillsSection />
+
+      {/* SEÇÃO DE PROJETOS COM FILTRO DINÂMICO */}
+      <section
+        id="projetos"
+        data-section="projetos"
+        className="border-b border-surface-200/60 px-4 py-20 sm:px-6"
+      >
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <SectionHeading
+              codeComment="projetos_em_producao"
+              title="Projetos & Cases Técnicos"
+              subtitle="Aplicações desenvolvidas com arquitetura pensada para escala, documentação em Markdown e código limpo."
+            />
+
+            {projectTags.length > 1 && (
+              <div
+                role="tablist"
+                aria-label="Filtrar projetos por tecnologia"
+                className="mb-12 flex flex-wrap gap-2"
+              >
+                {projectTags.map((tag) => {
+                  const active = selectedTag === tag
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setSelectedTag(tag)}
+                      className={`relative min-h-[38px] rounded-xl px-3.5 py-1.5 font-mono text-xs font-medium transition-colors cursor-pointer ${
+                        active
+                          ? 'text-white'
+                          : 'border border-surface-200 bg-surface-100/80 text-surface-600 hover:border-accent-400/40 hover:text-surface-900'
+                      }`}
+                    >
+                      {active && (
+                        <motion.span
+                          layoutId="home-project-filter"
+                          transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+                          className="bg-accent-gradient absolute inset-0 -z-10 rounded-xl shadow-sm"
+                        />
+                      )}
+                      <span>{tag}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {displayedProjects.length === 0 ? (
+            <div className="bento-card rounded-2xl p-12 text-center font-mono text-sm text-surface-500">
+              Nenhum projeto encontrado para o filtro "{selectedTag}".
+            </div>
+          ) : (
+            <motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <AnimatePresence mode="popLayout">
+                {displayedProjects.map((project, index) => (
+                  <ProjectCard key={project.id} project={project} index={index} />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-6"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5 }}
+            className="mt-12 flex justify-center"
           >
-            <motion.div variants={itemVariants}>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-900 px-3.5 py-1 text-xs font-semibold text-white shadow-sm">
-                Olá, eu sou 👋
-              </span>
-            </motion.div>
-
-            <motion.h1
-              variants={itemVariants}
-              className="text-4xl font-bold leading-tight tracking-tight text-surface-900 md:text-5xl lg:text-6xl"
-            >
-              Alexandre Junior
-              <span className="block text-gradient">Desenvolvedor Full-Stack</span>
-            </motion.h1>
-
-            <motion.p
-              variants={itemVariants}
-              className="max-w-lg text-lg leading-relaxed text-surface-500"
-            >
-              Estudante de Ciência da Computação especializado no desenvolvimento 
-              de aplicações web completas. Experiência na criação de APIs (Node.js, Java) e 
-              aplicações reativas (TypeScript, React, Vue)
-            </motion.p>
-
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-4 pt-2">
-              <Link to="/portfolio">
-                <Button variant="primary">Ver Portfólio</Button>
-              </Link>
-              <Link to="/contato">
-                <Button variant="secondary">Entrar em Contato</Button>
-              </Link>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="flex items-center gap-3 pt-4">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.label}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl border border-surface-200 bg-white text-surface-800 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-surface-900 hover:bg-surface-900 hover:text-white hover:shadow-soft"
-                >
-                  {link.icon}
-                </a>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Foto de perfil com animação de entrada suave e hover scale 1.02 */}
-          <motion.div
-            variants={imageVariants}
-            initial="hidden"
-            animate="visible"
-            className="relative mx-auto w-full max-w-sm"
-          >
-            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-surface-200/50 via-accent-400/10 to-surface-300/30 blur-2xl opacity-70" />
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-              className="relative overflow-hidden rounded-3xl border border-surface-200 bg-white shadow-elevated transition-shadow duration-300 hover:shadow-2xl"
-            >
-              <img
-                src="/fotoHome.png"
-                alt="Foto de perfil"
-                className="aspect-square w-full object-cover"
-              />
-            </motion.div>
+            <Link to="/portfolio">
+              <Button variant="secondary">
+                <FolderGit2 className="h-4 w-4 text-accent-400" />
+                <span>Ver catálogo completo ({projects.length})</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </motion.div>
         </div>
       </section>
 
-      {featured.length > 0 && (
-        <section className="px-6 py-20">
-          <div className="mx-auto max-w-6xl">
-            <SectionHeading
-              eyebrow="Destaques"
-              title="Projetos em evidência"
-              subtitle="Uma seleção dos trabalhos mais recentes."
+      {/* BANNER CTA FINAL PARA CONTRATAÇÃO */}
+      <section data-section="contato" className="px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="bento-card relative overflow-hidden rounded-3xl p-8 sm:p-12">
+            <div
+              className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full opacity-40 blur-3xl"
+              style={{ background: 'var(--accent-glow)' }}
+              aria-hidden="true"
             />
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((project, index) => (
-                <ProjectCard key={project.id} project={project} index={index} />
-              ))}
+            <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+              <div className="max-w-2xl space-y-3">
+                <p className="font-mono text-xs font-semibold text-accent-400">
+                  // pronto_para_colaborar
+                </p>
+                <h2 className="font-display text-fluid-h2 font-bold tracking-tight text-surface-900">
+                  Procurando um desenvolvedor com atenção aos detalhes?
+                </h2>
+                <p className="text-base leading-relaxed text-surface-600">
+                  Estou disponível para oportunidades remotas como{' '}
+                  <strong className="font-semibold text-surface-900">
+                    {PROFILE_DATA.role}
+                  </strong>{' '}
+                  ou projetos sob demanda. Vamos conversar sobre como posso agregar ao seu time.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3.5">
+                <Link to="/contato">
+                  <Button variant="primary">
+                    <Send className="h-4 w-4" />
+                    <span>Iniciar Conversa</span>
+                  </Button>
+                </Link>
+                <a
+                  href={PROFILE_DATA.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="secondary">Conectar no LinkedIn</Button>
+                </a>
+              </div>
             </div>
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="mt-12 text-center"
-            >
-              <Link to="/portfolio">
-                <Button variant="secondary">Ver todos os projetos</Button>
-              </Link>
-            </motion.div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
     </>
   )
 }
