@@ -9,7 +9,6 @@ import {
 } from 'react'
 import type { Project, ProjectInput } from '@/types/project'
 import * as projectService from '@/services/projectService'
-import { subscribeToProjectsRealtime } from '@/services/supabaseClient'
 import { SEED_PROJECTS } from '@/data/seedProjects'
 
 export type SyncSource = 'supabase' | 'backend' | 'local'
@@ -53,11 +52,6 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void refresh()
 
-    // Escuta alterações em tempo real vindas do Supabase (quando configurado)
-    const unsubscribeRealtime = subscribeToProjectsRealtime(() => {
-      void refresh()
-    })
-
     // Sincroniza automaticamente quando a aba do navegador volta a ganhar foco
     const handleFocus = () => {
       void refresh()
@@ -65,7 +59,6 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
     window.addEventListener('focus', handleFocus)
 
     return () => {
-      unsubscribeRealtime()
       window.removeEventListener('focus', handleFocus)
     }
   }, [refresh])

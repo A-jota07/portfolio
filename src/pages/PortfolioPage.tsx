@@ -1,14 +1,35 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Search, X } from 'lucide-react'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ProjectCard } from '@/components/portfolio/ProjectCard'
 import { useProjects } from '@/context/ProjectsContext'
+import { supabase } from '@/services/supabaseClient'
 
 export function PortfolioPage() {
-  const { projects } = useProjects()
+  const { projects, refresh } = useProjects()
   const [selectedTag, setSelectedTag] = useState<string>('Todos')
   const [searchQuery, setSearchQuery] = useState<string>('')
+
+  useEffect(() => {
+    if (!supabase) return
+
+    const channel = supabase
+      .channel('portfolio-projects-sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'projects' },
+        () => {
+          void refresh()
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase?.removeChannel(channel)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Deriva categorias dinamicamente das tags existentes nos projetos cadastrados
   const availableTags = useMemo(() => {

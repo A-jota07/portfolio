@@ -30,7 +30,7 @@ export function EditProjectPage() {
           </h1>
           <p className="mt-1 text-sm text-surface-500">{project.title}</p>
         </div>
-        <Link to={`/portfolio/${project.slug}`} target="_blank">
+        <Link to={`/portfolio/${project.slug}`} target="_blank" rel="noopener noreferrer">
           <Button variant="secondary">Ver publicado</Button>
         </Link>
       </div>

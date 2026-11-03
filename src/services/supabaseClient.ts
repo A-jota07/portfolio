@@ -16,25 +16,4 @@ export const supabaseClient: SupabaseClient | null = isFrontendSupabaseConfigure
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null
 
-export function subscribeToProjectsRealtime(onChange: () => void): () => void {
-  if (!supabaseClient) return () => {}
-
-  try {
-    const channel = supabaseClient
-      .channel('portfolio-projects-sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'projects' },
-        () => {
-          onChange()
-        },
-      )
-      .subscribe()
-
-    return () => {
-      void supabaseClient.removeChannel(channel)
-    }
-  } catch {
-    return () => {}
-  }
-}
+export const supabase = supabaseClient
