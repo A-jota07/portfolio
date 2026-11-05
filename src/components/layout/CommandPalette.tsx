@@ -6,6 +6,7 @@ import {
   Code2,
   ExternalLink,
   FileCode2,
+  FileDown,
   FolderGit2,
   HelpCircle,
   Mail,
@@ -21,6 +22,7 @@ import {
 import { PALETTE_OPTIONS, useTheme } from '@/context/ThemeContext'
 import { useProjects } from '@/context/ProjectsContext'
 import { PROFILE_DATA } from '@/data/profile'
+import { downloadResumeFile } from '@/services/resumeService'
 
 interface CommandItem {
   id: string
@@ -116,6 +118,17 @@ export function CommandPalette() {
         action: () => {
           closeCommandPalette()
           navigate('/contato')
+        },
+      },
+      {
+        id: 'action-download-resume',
+        group: '// acoes_rapidas',
+        label: 'Baixar Currículo / CV Completo (.pdf)',
+        hint: 'download .pdf',
+        icon: <FileDown className="h-4 w-4 text-accent-400" />,
+        action: () => {
+          closeCommandPalette()
+          void downloadResumeFile()
         },
       },
       {

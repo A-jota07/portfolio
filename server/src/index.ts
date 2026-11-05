@@ -7,6 +7,7 @@ import { env } from './config/env.js'
 import { authRouter } from './routes/auth.routes.js'
 import { adminRouter } from './routes/admin.routes.js'
 import { uploadRouter } from './routes/upload.routes.js'
+import { resumeRouter } from './routes/resume.routes.js'
 import { projectsRouter } from './routes/projects.routes.js'
 import { isServerSupabaseConfigured } from './services/projects.service.js'
 
@@ -52,6 +53,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/projects', projectsRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/upload', uploadRouter)
+app.use('/api/resume', resumeRouter)
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Rota não encontrada.' })

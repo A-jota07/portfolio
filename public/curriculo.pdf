@@ -1,0 +1,189 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 7 0 R /Resources << /Font << /F1 4 0 R /F2 5 0 R /F3 6 0 R >> >> >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >>
+endobj
+7 0 obj
+<< /Length 4718 >>
+stream
+0.1 0.12 0.18 rg
+0 834 595 8 re f
+0.08 0.10 0.15 rg
+BT
+/F2 20 Tf
+50 787 Td
+(Alexandre Cassio de Souza Junior) Tj
+ET
+0.15 0.50 0.45 rg
+BT
+/F2 11 Tf
+50 770 Td
+(ENGENHEIRO FULL STACK JUNIOR | CIENCIA DA COMPUTACAO) Tj
+ET
+0.35 0.40 0.45 rg
+BT
+/F1 9 Tf
+50 752 Td
+(Rondonopolis - MT  |  Email: alexandrecassiodesouzajunior@gmail.com) Tj
+ET
+BT
+/F1 9 Tf
+50 738 Td
+(GitHub: https://github.com/A-jota07  |  LinkedIn: https://linkedin.com/in/alexandre-c-souza-jr) Tj
+ET
+0.85 0.88 0.92 RG 1 w 50 726 m 545 726 l S
+0.1 0.15 0.25 rg
+BT
+/F2 12 Tf
+50 704 Td
+(// RESUMO PROFISSIONAL) Tj
+ET
+0.2 0.6 0.5 RG 2 w 50 700 m 120 700 l S
+0.2 0.25 0.3 rg
+BT /F1 9.5 Tf
+50 686 Td
+(Engenheiro Full Stack Junior e graduando em Ciencia da Computacao focado em construir aplicacoes web) Tj ET
+BT /F1 9.5 Tf
+50 673 Td
+(modernas, performaticas e escalaveis. Atuacao de ponta a ponta: da arquitetura de interfaces responsivas e acessiveis) Tj ET
+BT /F1 9.5 Tf
+50 660 Td
+(\(React 19, TypeScript, Tailwind CSS, Vue\) a construcao e integracao de APIs robustas \(Node.js, Express, Python,) Tj ET
+BT /F1 9.5 Tf
+50 647 Td
+(PostgreSQL, Supabase\) com autenticacao JWT e validacao estrita.) Tj ET
+0.1 0.15 0.25 rg
+BT
+/F2 12 Tf
+50 624 Td
+(// HABILIDADES TECNICAS & STACK) Tj
+ET
+0.2 0.6 0.5 RG 2 w 50 620 m 120 620 l S
+BT /F2 9.5 Tf 0.15 0.20 0.25 rg
+50 606 Td
+(Front-end:) Tj ET
+BT /F1 9.5 Tf 0.25 0.30 0.35 rg
+160 606 Td
+(React 19, TypeScript, JavaScript \(ESNext\), Vue.js, Tailwind CSS v4, Framer Motion, HTML5 Semantico, CSS3) Tj ET
+BT /F2 9.5 Tf 0.15 0.20 0.25 rg
+50 592 Td
+(Back-end:) Tj ET
+BT /F1 9.5 Tf 0.25 0.30 0.35 rg
+160 592 Td
+(Node.js, Express, Python \(APIs e Automacao\), Java \(Fundamentos e POO\), C \(Sistemas e Estrutura de Dados\)) Tj ET
+BT /F2 9.5 Tf 0.15 0.20 0.25 rg
+50 578 Td
+(Bancos & DevOps:) Tj ET
+BT /F1 9.5 Tf 0.25 0.30 0.35 rg
+160 578 Td
+(PostgreSQL, Supabase, Git, GitHub Actions, Docker basico, Deploy \(Vercel, Render\), Linux) Tj ET
+BT /F2 9.5 Tf 0.15 0.20 0.25 rg
+50 564 Td
+(Arquitetura & Qualidade:) Tj ET
+BT /F1 9.5 Tf 0.25 0.30 0.35 rg
+160 564 Td
+(APIs RESTful, Autenticacao JWT, Validacao Zod, Clean Code, Acessibilidade \(WCAG AA\), SEO Tecnico) Tj ET
+0.1 0.15 0.25 rg
+BT
+/F2 12 Tf
+50 540 Td
+(// EXPERIENCIA PROFISSIONAL) Tj
+ET
+0.2 0.6 0.5 RG 2 w 50 536 m 120 536 l S
+BT /F2 10.5 Tf 0.1 0.15 0.2 rg
+50 522 Td
+(Desenvolvedor Full Stack \(Projetos em Producao & Atuacao Independente\)) Tj ET
+BT /F3 9 Tf 0.4 0.45 0.5 rg
+410 522 Td
+(2024 - Presente) Tj ET
+BT /F3 9.5 Tf 0.3 0.35 0.4 rg
+50 509 Td
+(Atuacao Independente / Remoto e Presencial - Rondonopolis - MT) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 495 Td
+(- Desenvolvimento completo de aplicacoes web modernas, integrando front-end SPA e back-end em nuvem.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 483 Td
+(- Arquitetura de CMS proprio com editor de conteudo rico \(Markdown\), upload de imagens e autenticacao JWT.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 471 Td
+(- Criacao de interfaces reativas e de alta performance com React 19, TypeScript, Tailwind CSS e Framer Motion.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 459 Td
+(- Integracao de servicos de persistencia em PostgreSQL/Supabase com controle de acesso e seguranca de dados.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 447 Td
+(- Configuracao de pipelines de deploy continuo em Vercel \(Frontend\) e Render \(API Node.js/Express\).) Tj ET
+0.1 0.15 0.25 rg
+BT
+/F2 12 Tf
+50 423 Td
+(// FORMACAO ACADEMICA) Tj
+ET
+0.2 0.6 0.5 RG 2 w 50 419 m 120 419 l S
+BT /F2 10.5 Tf 0.1 0.15 0.2 rg
+50 405 Td
+(Bacharelado em Ciencia da Computacao) Tj ET
+BT /F3 9 Tf 0.4 0.45 0.5 rg
+430 405 Td
+(Em andamento) Tj ET
+BT /F1 9.5 Tf 0.3 0.35 0.4 rg
+50 392 Td
+(Formacao Academica Superior - Rondonopolis - MT) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 379 Td
+(- Base consistente em estruturas de dados, complexidade de algoritmos e organizacao de computadores.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 367 Td
+(- Paradigmas de programacao: Orientacao a Objetos em Java, manipulacao de memoria e ponteiros em C.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 355 Td
+(- Engenharia de software, modelagem de banco de dados relacional \(SQL\) e padroes arquiteturais.) Tj ET
+0.1 0.15 0.25 rg
+BT
+/F2 12 Tf
+50 331 Td
+(// DESTAQUES & DIFERENCIAIS) Tj
+ET
+0.2 0.6 0.5 RG 2 w 50 327 m 120 327 l S
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 313 Td
+(- Portfolio interativo no ar com tema dinamico, terminal interativo, atalhos de teclado e CMS administrativo integrado.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 301 Td
+(- Perfil analitico, autodidata, com facilidade de comunicacao e aprendizado agil de novas ferramentas.) Tj ET
+BT /F1 9 Tf 0.25 0.30 0.35 rg
+60 289 Td
+(- Codigo limpo, bem documentado, com foco constante em estabilidade, ergonomia de uso e acessibilidade.) Tj ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000267 00000 n 
+0000000337 00000 n 
+0000000412 00000 n 
+0000000490 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+5260
+%%EOF

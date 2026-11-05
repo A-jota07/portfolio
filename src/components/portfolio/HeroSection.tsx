@@ -5,6 +5,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Code2,
+  FileDown,
   FolderGit2,
   MapPin,
   Sparkles,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { PROFILE_DATA } from '@/data/profile'
+import { useResume } from '@/hooks/useResume'
 
 const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_/<>#$%'
 
@@ -149,6 +151,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ publishedProjectsCount }: HeroSectionProps) {
+  const { download, isDownloading } = useResume()
   const prefersReducedMotion = Boolean(useReducedMotion())
   const scrambledName = useScrambledText(PROFILE_DATA.shortName, prefersReducedMotion)
   const rotatingRole = useRotatingTypewriter(
@@ -223,8 +226,24 @@ export function HeroSection({ publishedProjectsCount }: HeroSectionProps) {
                 </Button>
               </Link>
 
+              <Button
+                variant="secondary"
+                onClick={() => void download()}
+                disabled={isDownloading}
+                aria-label="Baixar currículo completo de Alexandre Cássio de Souza Junior em PDF"
+                title="Baixar currículo (PDF)"
+                className="group border-accent-400/30 hover:border-accent-400/70"
+              >
+                <FileDown
+                  className={`h-4 w-4 text-accent-400 transition-transform group-hover:-translate-y-0.5 ${
+                    isDownloading ? 'animate-bounce' : ''
+                  }`}
+                />
+                <span>{isDownloading ? 'Baixando CV...' : 'Baixar Currículo'}</span>
+              </Button>
+
               <Link to="/portfolio">
-                <Button variant="secondary">
+                <Button variant="ghost">
                   <FolderGit2 className="h-4 w-4 text-accent-400" />
                   <span>Explorar Projetos</span>
                 </Button>

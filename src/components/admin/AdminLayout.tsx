@@ -53,6 +53,18 @@ export function AdminLayout() {
               >
                 _novo.md
               </NavLink>
+              <NavLink
+                to="/admin/curriculo"
+                className={({ isActive }) =>
+                  `rounded-lg px-3 py-1.5 transition-colors ${
+                    isActive
+                      ? 'bg-surface-200 text-surface-900 font-semibold'
+                      : 'text-surface-500 hover:text-surface-900'
+                  }`
+                }
+              >
+                _curriculo.pdf
+              </NavLink>
             </nav>
           </div>
 

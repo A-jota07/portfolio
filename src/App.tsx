@@ -31,6 +31,9 @@ const CreateProjectPage = lazy(() =>
 const EditProjectPage = lazy(() =>
   import('@/pages/admin/EditProjectPage').then((m) => ({ default: m.EditProjectPage })),
 )
+const ResumePage = lazy(() =>
+  import('@/pages/admin/ResumePage').then((m) => ({ default: m.ResumePage })),
+)
 
 function RouteLoader() {
   return (
@@ -65,6 +68,7 @@ export function App() {
                     <Route index element={<DashboardPage />} />
                     <Route path="novo" element={<CreateProjectPage />} />
                     <Route path="editar/:id" element={<EditProjectPage />} />
+                    <Route path="curriculo" element={<ResumePage />} />
                   </Route>
                 </Route>
 
