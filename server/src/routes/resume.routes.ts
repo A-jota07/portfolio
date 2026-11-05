@@ -3,17 +3,25 @@ import { authenticate } from '../middleware/authenticate.middleware.js'
 import { requireAdmin } from '../middleware/requireAdmin.middleware.js'
 import { handleResumeUpload } from '../middleware/resumeUpload.middleware.js'
 import {
+  downloadResumeController,
   getResumeController,
   resetResumeController,
   uploadResumeController,
+  viewResumeController,
 } from '../controllers/resume.controller.js'
 
 export const resumeRouter = Router()
 
-// Consulta pública do currículo atual (usada pela Hero e visitantes)
+// Metadados públicos do currículo
 resumeRouter.get('/', getResumeController)
 
-// Upload ou configuração do currículo (protegido por token JWT de admin)
+// Visualização direta no navegador (com cabeçalhos MIME corretos)
+resumeRouter.get('/view', viewResumeController)
+
+// Download direto para recrutadores
+resumeRouter.get('/download', downloadResumeController)
+
+// Upload ou configuração de currículo (admin autenticado com JWT)
 resumeRouter.post(
   '/',
   authenticate,
@@ -22,5 +30,5 @@ resumeRouter.post(
   uploadResumeController,
 )
 
-// Reset para o currículo padrão original (admin)
+// Restauração para o currículo padrão (admin)
 resumeRouter.delete('/', authenticate, requireAdmin, resetResumeController)

@@ -58,6 +58,29 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
         </h3>
       )
     },
+    a: ({ href, children, ...props }) => {
+      const raw = href ?? ''
+      const isSafe =
+        raw.startsWith('https://') ||
+        raw.startsWith('http://') ||
+        raw.startsWith('mailto:') ||
+        raw.startsWith('/') ||
+        raw.startsWith('#')
+
+      const safeHref = isSafe ? raw : '#'
+      const isExternal = safeHref.startsWith('http://') || safeHref.startsWith('https://')
+
+      return (
+        <a
+          href={safeHref}
+          target={isExternal ? '_blank' : undefined}
+          rel={isExternal ? 'noopener noreferrer' : undefined}
+          {...props}
+        >
+          {children}
+        </a>
+      )
+    },
   }
 
   return (

@@ -60,6 +60,22 @@ export function resolveResumeUrl(url?: string): string {
   return url
 }
 
+/**
+ * Converte com segurança Data URL base64 para Blob binário
+ */
+export function dataUrlToBlob(dataUrl: string): Blob {
+  const parts = dataUrl.split(',')
+  const mimeMatch = parts[0].match(/:(.*?);/)
+  const mime = mimeMatch ? mimeMatch[1] : 'application/pdf'
+  const bstr = atob(parts[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new Blob([u8arr], { type: mime })
+}
+
 export async function fetchResumeInfo(): Promise<ResumeInfo> {
   try {
     const res = await fetch(API_RESUME, { method: 'GET' })
@@ -104,7 +120,7 @@ export async function uploadResumeFile(file: File): Promise<ResumeInfo> {
     }
   } catch (error) {
     // Fallback: se o backend não estiver respondendo, converte para DataURL local para não travar o admin
-    if (file.size <= 4 * 1024 * 1024) {
+    if (file.size <= 8 * 1024 * 1024) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = () => {
@@ -189,13 +205,84 @@ export async function resetResume(): Promise<ResumeInfo> {
   return DEFAULT_RESUME
 }
 
+/**
+ * Abre o documento em nova aba com garantia de renderização sem tela preta.
+ * Converte data URLs para Object URLs nativas de Blob e usa endpoint dedicado da API quando disponível.
+ */
+export function openResumeInNewTab(resumeInfo?: ResumeInfo): void {
+  const info = resumeInfo || getLocalStoredResume()
+  const rawUrl = info.url || '/curriculo.pdf'
+
+  // Caso 1: Data URL base64 (upload local sem backend conectado)
+  if (rawUrl.startsWith('data:')) {
+    try {
+      const blob = dataUrlToBlob(rawUrl)
+      const blobUrl = URL.createObjectURL(blob)
+      const win = window.open(blobUrl, '_blank')
+      if (!win) {
+        window.location.href = blobUrl
+      }
+      return
+    } catch {
+      // Prossegue para fallback caso atob falhe
+    }
+  }
+
+  // Caso 2: Arquivo no backend Express (/uploads/...)
+  if (rawUrl.startsWith('/uploads/')) {
+    // Endpoint dedicado /api/resume/view com cabeçalhos inline e Content-Type: application/pdf
+    const viewEndpoint = BASE_URL ? `${BASE_URL}/api/resume/view` : '/api/resume/view'
+    window.open(viewEndpoint, '_blank', 'noopener,noreferrer')
+    return
+  }
+
+  // Caso 3: URL normal ou arquivo público local /curriculo.pdf
+  const resolved = resolveResumeUrl(rawUrl)
+  window.open(resolved, '_blank', 'noopener,noreferrer')
+}
+
+/**
+ * Dispara o download direto do currículo com tratamento robusto cross-origin
+ */
 export async function downloadResumeFile(resumeInfo?: ResumeInfo): Promise<void> {
   const info = resumeInfo || getLocalStoredResume()
-  const targetUrl = resolveResumeUrl(info.url)
+  const rawUrl = info.url || '/curriculo.pdf'
   const filename = info.filename || 'Curriculo_Alexandre_Junior.pdf'
 
-  // Para data URLs e URLs relativas do mesmo domínio
-  if (targetUrl.startsWith('data:') || targetUrl.startsWith('/') || targetUrl.startsWith('blob:')) {
+  // Caso 1: Data URL
+  if (rawUrl.startsWith('data:')) {
+    try {
+      const blob = dataUrlToBlob(rawUrl)
+      const blobUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000)
+      return
+    } catch {
+      // segue para fallback
+    }
+  }
+
+  // Caso 2: Arquivo local no backend Express
+  if (rawUrl.startsWith('/uploads/')) {
+    const downloadEndpoint = BASE_URL ? `${BASE_URL}/api/resume/download` : '/api/resume/download'
+    const a = document.createElement('a')
+    a.href = downloadEndpoint
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    return
+  }
+
+  const targetUrl = resolveResumeUrl(rawUrl)
+
+  // Caso 3: URL estática relativa da mesma origem
+  if (targetUrl.startsWith('/') || targetUrl.startsWith('blob:')) {
     const a = document.createElement('a')
     a.href = targetUrl
     a.download = filename
@@ -205,7 +292,7 @@ export async function downloadResumeFile(resumeInfo?: ResumeInfo): Promise<void>
     return
   }
 
-  // Para URLs remotas (HTTP / HTTPS), tentar fetch para contornar restrições de cross-origin do atributo download
+  // Caso 4: URLs remotas (HTTP / HTTPS)
   try {
     const response = await fetch(targetUrl, { mode: 'cors' })
     if (response.ok) {
@@ -217,11 +304,11 @@ export async function downloadResumeFile(resumeInfo?: ResumeInfo): Promise<void>
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000)
       return
     }
   } catch {
-    // Se o fetch falhar por CORS, abre diretamente
+    // Falha por CORS
   }
 
   const fallbackLink = document.createElement('a')

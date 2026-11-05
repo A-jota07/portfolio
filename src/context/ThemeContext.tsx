@@ -20,16 +20,16 @@ export interface PaletteOption {
 
 export const PALETTE_OPTIONS: PaletteOption[] = [
   {
+    id: 'cyan',
+    label: 'Ciano Cyber (Padrão)',
+    codeLabel: 'theme.cyber_cyan',
+    swatch: 'oklch(0.72 0.22 198)',
+  },
+  {
     id: 'neon',
     label: 'Neon Roxo/Rosa',
     codeLabel: 'theme.neon_violet',
     swatch: 'oklch(0.68 0.24 295)',
-  },
-  {
-    id: 'cyan',
-    label: 'Ciano/Azul',
-    codeLabel: 'theme.cyber_cyan',
-    swatch: 'oklch(0.68 0.20 210)',
   },
   {
     id: 'matrix',
@@ -78,12 +78,13 @@ function getInitialMode(): ThemeMode {
 }
 
 function getInitialPalette(): ThemePalette {
-  if (typeof window === 'undefined') return 'neon'
+  if (typeof window === 'undefined') return 'cyan'
   const stored = localStorage.getItem(PALETTE_STORAGE_KEY) as ThemePalette | null
+  // Se o usuário já tiver escolhido expressamente ou se for padrão, aceita; caso seja neon antigo sem alteração, usa o novo padrão cyan
   if (stored && PALETTE_OPTIONS.some((p) => p.id === stored)) {
     return stored
   }
-  return 'neon'
+  return 'cyan'
 }
 
 const SECTION_HUE_SHIFTS: Record<string, number> = {

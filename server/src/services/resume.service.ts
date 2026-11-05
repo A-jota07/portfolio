@@ -13,6 +13,7 @@ export interface ResumeMetadata {
 
 const DATA_DIR = path.resolve(process.cwd(), 'data')
 const RESUME_FILE = path.join(DATA_DIR, 'resume.json')
+const UPLOAD_DIR = path.resolve(process.cwd(), 'uploads')
 
 const DEFAULT_RESUME: ResumeMetadata = {
   url: '/curriculo.pdf',
@@ -44,6 +45,53 @@ export function getResumeService(): ResumeMetadata {
     return DEFAULT_RESUME
   } catch {
     return DEFAULT_RESUME
+  }
+}
+
+/**
+ * Retorna o caminho físico do arquivo do currículo no disco
+ * para servir diretamente em streaming com os headers apropriados.
+ */
+export function getResumeFilePathService(): {
+  filePath: string | null
+  filename: string
+  mimetype: string
+} {
+  const meta = getResumeService()
+
+  // Se for upload local com caminho /uploads/<nome>
+  if (meta.url.startsWith('/uploads/')) {
+    const localFilename = path.basename(meta.url)
+    const fullPath = path.join(UPLOAD_DIR, localFilename)
+    if (fs.existsSync(fullPath)) {
+      return {
+        filePath: fullPath,
+        filename: meta.filename || 'Curriculo_Alexandre_Junior.pdf',
+        mimetype: meta.mimetype || 'application/pdf',
+      }
+    }
+  }
+
+  // Fallback: busca public/curriculo.pdf na raiz ou relativo ao cwd
+  const publicCandidates = [
+    path.resolve(process.cwd(), 'public', 'curriculo.pdf'),
+    path.resolve(process.cwd(), '..', 'public', 'curriculo.pdf'),
+  ]
+
+  for (const candidate of publicCandidates) {
+    if (fs.existsSync(candidate)) {
+      return {
+        filePath: candidate,
+        filename: 'Curriculo_Alexandre_Junior.pdf',
+        mimetype: 'application/pdf',
+      }
+    }
+  }
+
+  return {
+    filePath: null,
+    filename: meta.filename || 'Curriculo_Alexandre_Junior.pdf',
+    mimetype: 'application/pdf',
   }
 }
 

@@ -11,16 +11,57 @@ import {
 } from '../services/projects.service.js'
 
 const projectInputSchema = z.object({
-  title: z.string().min(1, 'Título é obrigatório.'),
-  summary: z.string().min(1, 'Resumo é obrigatório.'),
-  coverImage: z.string().min(1, 'Imagem de capa é obrigatória.'),
-  tags: z.array(z.string()).default([]),
-  content: z.string().default(''),
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Título é obrigatório.')
+    .max(120, 'Título não pode exceder 120 caracteres.'),
+  summary: z
+    .string()
+    .trim()
+    .min(1, 'Resumo é obrigatório.')
+    .max(350, 'Resumo não pode exceder 350 caracteres.'),
+  coverImage: z
+    .string()
+    .trim()
+    .min(1, 'Imagem de capa é obrigatória.')
+    .max(2000, 'URL da imagem muito longa.')
+    .refine(
+      (val) =>
+        val.startsWith('/') ||
+        val.startsWith('https://') ||
+        val.startsWith('http://') ||
+        val.startsWith('data:image/'),
+      { message: 'URL de imagem de capa inválida.' },
+    ),
+  tags: z
+    .array(
+      z
+        .string()
+        .trim()
+        .max(35, 'Nome de tag muito longo.')
+        .regex(/^[a-zA-Z0-9.\-_#+/\s]+$/, 'Tag contém caracteres inválidos.'),
+    )
+    .max(15, 'Máximo de 15 tags permitidas.')
+    .default([]),
+  content: z.string().max(80000, 'Conteúdo excede o limite máximo permitido.').default(''),
   featured: z.boolean().optional().default(false),
   repositoryUrl: z
     .string()
     .nullish()
-    .transform((val) => (val && val.trim().length > 0 ? val.trim() : undefined)),
+    .transform((val) => (val && val.trim().length > 0 ? val.trim() : undefined))
+    .refine(
+      (val) => {
+        if (!val) return true
+        try {
+          const parsed = new URL(val)
+          return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+        } catch {
+          return false
+        }
+      },
+      { message: 'URL do repositório deve ser um link HTTP ou HTTPS válido.' },
+    ),
 })
 
 export async function listProjectsHandler(_req: Request, res: Response): Promise<void> {

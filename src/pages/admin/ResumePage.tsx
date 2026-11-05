@@ -1,4 +1,4 @@
-import { useState, useRef, type DragEvent, type ChangeEvent } from 'react'
+import { useState, useRef, useMemo, type DragEvent, type ChangeEvent } from 'react'
 import {
   FileText,
   UploadCloud,
@@ -11,10 +11,12 @@ import {
   FileCheck,
   RefreshCw,
   Sparkles,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useResume } from '@/hooks/useResume'
-import { resolveResumeUrl } from '@/services/resumeService'
+import { resolveResumeUrl, dataUrlToBlob } from '@/services/resumeService'
 
 function formatBytes(bytes?: number): string {
   if (!bytes || bytes <= 0) return 'Tamanho não informado'
@@ -45,6 +47,7 @@ export function ResumePage() {
     isLoading,
     isDownloading,
     isUploading,
+    view,
     download,
     upload,
     updateUrl,
@@ -56,10 +59,27 @@ export function ResumePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [urlInput, setUrlInput] = useState('')
   const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload')
+  const [showInlinePreview, setShowInlinePreview] = useState(false)
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error'
     message: string
   } | null>(null)
+
+  const previewSrc = useMemo(() => {
+    if (!resume.url) return '/curriculo.pdf'
+    if (resume.url.startsWith('data:')) {
+      try {
+        const blob = dataUrlToBlob(resume.url)
+        return URL.createObjectURL(blob)
+      } catch {
+        return resume.url
+      }
+    }
+    if (resume.url.startsWith('/uploads/')) {
+      return '/api/resume/view'
+    }
+    return resolveResumeUrl(resume.url)
+  }, [resume.url])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -318,17 +338,15 @@ export function ResumePage() {
             {/* Ações do Currículo Atual */}
             <div className="mt-6 flex flex-col gap-2.5">
               <div className="grid grid-cols-2 gap-2">
-                <a
-                  href={resolvedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full"
+                <Button
+                  variant="secondary"
+                  className="w-full justify-center text-xs"
+                  magnetic={false}
+                  onClick={() => view()}
                 >
-                  <Button variant="secondary" className="w-full justify-center text-xs" magnetic={false}>
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    <span>Visualizar</span>
-                  </Button>
-                </a>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>Abrir em Nova Aba</span>
+                </Button>
 
                 <Button
                   variant="primary"
@@ -341,6 +359,25 @@ export function ResumePage() {
                   <span>{isDownloading ? 'Baixando...' : 'Baixar CV'}</span>
                 </Button>
               </div>
+
+              <Button
+                variant="secondary"
+                className="w-full justify-center text-xs border-accent-400/30 hover:border-accent-400/70"
+                magnetic={false}
+                onClick={() => setShowInlinePreview((prev) => !prev)}
+              >
+                {showInlinePreview ? (
+                  <>
+                    <EyeOff className="h-3.5 w-3.5 text-accent-400" />
+                    <span>Ocultar Pré-visualização</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-3.5 w-3.5 text-accent-400" />
+                    <span>Pré-visualizar na Tela</span>
+                  </>
+                )}
+              </Button>
 
               {resume.isCustom && (
                 <Button
@@ -512,6 +549,62 @@ export function ResumePage() {
           </div>
         </div>
       </div>
+
+      {/* Visualizador Embutido na Tela (Garante visualização nativa imediata) */}
+      {showInlinePreview && (
+        <div className="mt-8 rounded-2xl border border-surface-200/80 bg-surface-100/70 p-6 backdrop-blur-xl">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4 text-accent-400" />
+              <h3 className="font-mono text-sm font-bold text-surface-900">
+                // visualizador_documento_ativo ({resume.filename})
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                className="text-xs px-2.5 py-1"
+                onClick={() => view()}
+                magnetic={false}
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                <span>Abrir Externo</span>
+              </Button>
+              <button
+                type="button"
+                onClick={() => setShowInlinePreview(false)}
+                className="font-mono text-xs text-surface-400 hover:text-surface-200 cursor-pointer px-2 py-1"
+              >
+                ✕ Fechar
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-surface-200 bg-surface-900/90 shadow-2xl">
+            <object
+              data={previewSrc}
+              type="application/pdf"
+              className="h-[750px] w-full"
+            >
+              <div className="flex h-[300px] flex-col items-center justify-center p-6 text-center">
+                <FileText className="h-10 w-10 text-accent-400 mb-3" />
+                <p className="font-mono text-sm text-surface-200">
+                  Visualização embutida não suportada diretamente pelo seu navegador.
+                </p>
+                <Button
+                  variant="primary"
+                  className="mt-4"
+                  onClick={() => view()}
+                  magnetic={false}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span>Abrir Documento na Nova Aba</span>
+                </Button>
+              </div>
+            </object>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

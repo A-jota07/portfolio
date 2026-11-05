@@ -4,6 +4,7 @@ import {
   downloadResumeFile,
   fetchResumeInfo,
   getLocalStoredResume,
+  openResumeInNewTab,
   resetResume,
   setResumeExternalUrl,
   uploadResumeFile,
@@ -33,6 +34,10 @@ export function useResume() {
   useEffect(() => {
     void loadResume()
   }, [loadResume])
+
+  const view = useCallback(() => {
+    openResumeInNewTab(resume)
+  }, [resume])
 
   const download = useCallback(async () => {
     setIsDownloading(true)
@@ -99,6 +104,7 @@ export function useResume() {
     isDownloading,
     isUploading,
     error,
+    view,
     download,
     upload,
     updateUrl,
