@@ -33,6 +33,15 @@ async function verifyConfiguredPassword(plainPassword: string): Promise<boolean>
 
   const storedHash = env.ADMIN_PASSWORD_HASH.trim()
 
+  // Evita aceitar a senha padrão de dev ("admin123") caso o servidor esteja em produção sem hash configurado
+  if (
+    env.NODE_ENV === 'production' &&
+    storedHash === '$2b$12$b1EyIc5t9xpDDdtxza.oMO0pP8oLeK1TABhguNcN.NSbZGMOCzHpu' &&
+    !env.ADMIN_PASSWORD
+  ) {
+    return false
+  }
+
   // 2. Se ADMIN_PASSWORD_HASH for um hash bcrypt válido ($2a$, $2b$, $2y$)
   if (storedHash.startsWith('$2')) {
     return bcrypt.compare(plainPassword, storedHash)

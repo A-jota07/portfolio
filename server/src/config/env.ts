@@ -45,3 +45,17 @@ const envSchema = z.object({
 
 export const env = envSchema.parse(process.env)
 
+if (env.NODE_ENV === 'production') {
+  if (env.JWT_SECRET === DEFAULT_DEV_JWT_SECRET) {
+    console.warn(
+      '⚠️ [Segurança] JWT_SECRET não definido no ambiente de produção. Configure uma chave forte na Render.',
+    )
+  }
+  if (env.ADMIN_PASSWORD_HASH === DEFAULT_DEV_PASSWORD_HASH && !env.ADMIN_PASSWORD) {
+    console.warn(
+      '⚠️ [Segurança] ADMIN_PASSWORD_HASH padrão detectado em produção. Configure sua senha/hash na Render.',
+    )
+  }
+}
+
+

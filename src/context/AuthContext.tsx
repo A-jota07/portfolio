@@ -27,13 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(result.user)
       } else {
         const currentUser = await authService.fetchCurrentUser()
-        setUser(
-          currentUser ?? {
-            email: credentials.email.trim(),
-            name: 'Administrador',
-            role: 'admin',
-          },
-        )
+        setUser(currentUser)
       }
     }
     return result
