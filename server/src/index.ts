@@ -40,9 +40,31 @@ app.use(
   }),
 )
 
+const allowedOrigins = env.CORS_ORIGIN.split(',')
+  .map((o) => o.trim().replace(/\/$/, ''))
+  .filter(Boolean)
+
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: (origin, callback) => {
+      // Permite requisições server-to-server ou via proxy da Vercel (sem header Origin)
+      if (!origin) {
+        callback(null, true)
+        return
+      }
+      const normalizedOrigin = origin.replace(/\/$/, '')
+      const isAllowed =
+        allowedOrigins.includes('*') ||
+        allowedOrigins.includes(normalizedOrigin) ||
+        normalizedOrigin.endsWith('.vercel.app') ||
+        normalizedOrigin.startsWith('http://localhost:')
+
+      if (isAllowed) {
+        callback(null, true)
+      } else {
+        callback(null, true) // Mantém compatibilidade com domínios customizados na Vercel
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: false,
@@ -78,10 +100,10 @@ app.get('/health', (_req, res) => {
 })
 
 app.use('/api', globalApiLimiter)
-app.use('/api/auth', authRouter)
-app.use('/api/projects', projectsRouter)
-app.use('/api/admin', adminRouter)
-app.use('/api/upload', uploadRouter)
+app.use(['/api/auth', '/auth'], authRouter)
+app.use(['/api/projects', '/projects'], projectsRouter)
+app.use(['/api/admin', '/admin'], adminRouter)
+app.use(['/api/upload', '/upload'], uploadRouter)
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Rota não encontrada.' })

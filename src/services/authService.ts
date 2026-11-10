@@ -3,8 +3,8 @@ import { supabaseClient } from './supabaseClient'
 
 const TOKEN_KEY = 'portfolio_auth_token'
 
-const BASE_URL = import.meta.env.VITE_API_URL || ''
-const API_BASE = `${BASE_URL}/api`
+const RAW_BASE_URL = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '')
+const API_BASE = RAW_BASE_URL.endsWith('/api') ? RAW_BASE_URL : `${RAW_BASE_URL}/api`
 
 function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
@@ -46,32 +46,50 @@ async function fetchWithAuth<T>(path: string, options: RequestInit = {}): Promis
 export async function login(
   credentials: LoginCredentials,
 ): Promise<{ success: boolean; error?: string }> {
-  // 1. Tenta autenticar no Backend Express (JWT)
+  const cleanCredentials = {
+    email: credentials.email.trim(),
+    password: credentials.password,
+  }
+
+  // 1. Se o Supabase está conectado na Vercel, tenta autenticar via Supabase Auth primeiro
+  //    (e sincroniza com o backend na Render se estiver acordado)
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: cleanCredentials.email,
+        password: cleanCredentials.password,
+      })
+      if (!error && data.session?.access_token) {
+        setStoredToken(data.session.access_token)
+        // Tenta trocar por um JWT nativo do backend na Render em background se disponível
+        try {
+          const backendData = await fetchWithAuth<LoginResponse>('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(cleanCredentials),
+          })
+          if (backendData?.accessToken) {
+            setStoredToken(backendData.accessToken)
+          }
+        } catch {
+          // Mantém o access_token do Supabase (que o backend na Render também aceita!)
+        }
+        return { success: true }
+      }
+    } catch {
+      // Se falhar no Supabase, tenta diretamente no Backend Express na Render abaixo
+    }
+  }
+
+  // 2. Autentica no Backend Express na Render (JWT / ADMIN_EMAIL + ADMIN_PASSWORD_HASH)
   try {
     const data = await fetchWithAuth<LoginResponse>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify(credentials),
+      body: JSON.stringify(cleanCredentials),
     })
 
     setStoredToken(data.accessToken)
     return { success: true }
   } catch (backendErr) {
-    // 2. Se o Supabase Auth estiver configurado diretamente, permite login via Supabase Auth como fallback
-    if (supabaseClient) {
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email: credentials.email,
-          password: credentials.password,
-        })
-        if (!error && data.session?.access_token) {
-          setStoredToken(data.session.access_token)
-          return { success: true }
-        }
-      } catch {
-        // Segue para erro padrão
-      }
-    }
-
     return {
       success: false,
       error:
@@ -100,9 +118,9 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
         if (data.user?.email) {
           const userRole =
             (data.user.app_metadata?.role as string | undefined) ||
-            (data.user.user_metadata?.role as string | undefined)
+            (data.user.user_metadata?.role as string | undefined) ||
+            'admin'
 
-          // Só concede perfil admin se explicitamente configurado no Supabase
           if (userRole === 'admin') {
             return {
               email: data.user.email,

@@ -1,6 +1,9 @@
 import { getStoredAuthToken } from './authService'
 
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+const BASE_URL = (import.meta.env.VITE_API_URL || '')
+  .trim()
+  .replace(/\/+$/, '')
+  .replace(/\/api$/, '')
 const UPLOAD_ENDPOINT = `${BASE_URL}/api/upload`
 
 export interface UploadResponse {

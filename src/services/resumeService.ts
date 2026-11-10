@@ -1,8 +1,13 @@
 import { getStoredAuthToken } from './authService'
+import { supabaseClient } from './supabaseClient'
 
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+const BASE_URL = (import.meta.env.VITE_API_URL || '')
+  .trim()
+  .replace(/\/+$/, '')
+  .replace(/\/api$/, '')
 const RESUME_ENDPOINT = `${BASE_URL}/api/upload/resume`
 const STORAGE_KEY = 'portfolio_resume_config'
+const SUPABASE_CONFIG_PATH = 'resumes/resume-config.json'
 export const RESUME_UPDATED_EVENT = 'portfolio-resume-updated'
 
 export interface ResumeConfig {
@@ -48,6 +53,7 @@ function saveCachedResumeConfig(config: ResumeConfig): void {
 }
 
 export async function fetchResumeConfig(): Promise<ResumeConfig> {
+  // 1. Tenta buscar do Backend na Render
   try {
     const response = await fetch(RESUME_ENDPOINT)
     if (response.ok) {
@@ -61,18 +67,60 @@ export async function fetchResumeConfig(): Promise<ResumeConfig> {
             ? data.updatedAt
             : new Date().toISOString(),
       }
-      // Se o backend retornou vazio mas já temos um salvo localmente em fallback, preserva o local se for mais recente
-      const local = getCachedResumeConfig()
-      if (!normalized.url && local.url) {
-        return local
+      if (normalized.url) {
+        saveCachedResumeConfig(normalized)
+        return normalized
       }
-      saveCachedResumeConfig(normalized)
-      return normalized
     }
   } catch {
-    // Fallback offline para cache local
+    // Continua para o Supabase Storage
   }
+
+  // 2. Fallback direto no Supabase Storage (conectado na Vercel)
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.storage
+        .from('portfolio')
+        .download(SUPABASE_CONFIG_PATH)
+
+      if (!error && data) {
+        const text = await data.text()
+        const parsed = JSON.parse(text) as Partial<ResumeConfig>
+        if (typeof parsed.url === 'string') {
+          const remoteConfig: ResumeConfig = {
+            url: parsed.url,
+            filename: typeof parsed.filename === 'string' ? parsed.filename : 'curriculo.pdf',
+            enabled: typeof parsed.enabled === 'boolean' ? parsed.enabled : true,
+            updatedAt:
+              typeof parsed.updatedAt === 'string'
+                ? parsed.updatedAt
+                : new Date().toISOString(),
+          }
+          saveCachedResumeConfig(remoteConfig)
+          return remoteConfig
+        }
+      }
+    } catch {
+      // Continua para o cache local
+    }
+  }
+
   return getCachedResumeConfig()
+}
+
+async function syncConfigToSupabase(config: ResumeConfig): Promise<void> {
+  if (!supabaseClient) return
+  try {
+    const blob = new Blob([JSON.stringify(config, null, 2)], {
+      type: 'application/json',
+    })
+    await supabaseClient.storage.from('portfolio').upload(SUPABASE_CONFIG_PATH, blob, {
+      contentType: 'application/json',
+      upsert: true,
+    })
+  } catch {
+    // Ignora erro se bucket não permitir escrita direta pelo cliente
+  }
 }
 
 export async function updateResumeConfig(
@@ -99,7 +147,7 @@ export async function updateResumeConfig(
       return updated
     }
   } catch {
-    // Fallback para cache local quando API está offline
+    // Fallback para Supabase / cache local quando Render está em cold start
   }
 
   const current = getCachedResumeConfig()
@@ -109,6 +157,7 @@ export async function updateResumeConfig(
     enabled: partial.enabled !== undefined ? partial.enabled : current.enabled,
     updatedAt: new Date().toISOString(),
   }
+  await syncConfigToSupabase(fallbackUpdated)
   saveCachedResumeConfig(fallbackUpdated)
   return fallbackUpdated
 }
@@ -174,7 +223,41 @@ export async function uploadResumePdf(file: File): Promise<ResumeConfig> {
     if (err instanceof Error && err.message.includes('tamanho')) {
       throw err
     }
-    // Fallback local (Base64 Data URL) quando o backend não está acessível
+
+    // 2. Fallback direto para o Supabase Storage (quando o front na Vercel está conectado ao Supabase)
+    if (supabaseClient) {
+      try {
+        const storagePath = `resumes/cv-${Date.now()}.pdf`
+        const { error: upErr } = await supabaseClient.storage
+          .from('portfolio')
+          .upload(storagePath, file, {
+            contentType: 'application/pdf',
+            upsert: true,
+          })
+
+        if (!upErr) {
+          const { data: pubData } = supabaseClient.storage
+            .from('portfolio')
+            .getPublicUrl(storagePath)
+
+          if (pubData?.publicUrl) {
+            const supaConfig: ResumeConfig = {
+              url: pubData.publicUrl,
+              filename: file.name,
+              enabled: true,
+              updatedAt: new Date().toISOString(),
+            }
+            await syncConfigToSupabase(supaConfig)
+            saveCachedResumeConfig(supaConfig)
+            return supaConfig
+          }
+        }
+      } catch {
+        // Continua para fallback local Base64
+      }
+    }
+
+    // 3. Fallback local (Base64 Data URL) quando o backend não está acessível
     if (file.size <= 4 * 1024 * 1024) {
       const dataUrl = await fileToDataUrl(file)
       const localConfig: ResumeConfig = {

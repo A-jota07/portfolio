@@ -3,7 +3,10 @@ import { getStoredAuthToken } from './authService'
 import { supabaseClient } from './supabaseClient'
 
 const STORAGE_KEY = 'portfolio_projects'
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+const BASE_URL = (import.meta.env.VITE_API_URL || '')
+  .trim()
+  .replace(/\/+$/, '')
+  .replace(/\/api$/, '')
 const API_PROJECTS = `${BASE_URL}/api/projects`
 
 function slugify(text: string): string {
