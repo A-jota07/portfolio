@@ -9,34 +9,35 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
 }
 
+const MIME_TO_EXT: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+  'image/avif': '.avif',
+}
+
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, uploadDir)
   },
   filename: (_req, file, cb) => {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`
-    const ext = path.extname(file.originalname).toLowerCase() || '.jpg'
+    // Define a extensão estritamente a partir do MIME type verificado para prevenir upload de extensões arbitrárias
+    const ext = MIME_TO_EXT[file.mimetype.toLowerCase()] || '.jpg'
     cb(null, `img-${uniqueSuffix}${ext}`)
   },
 })
 
 const fileFilter: multer.Options['fileFilter'] = (_req, file, cb) => {
-  const allowedMimeTypes = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp',
-    'image/gif',
-    'image/svg+xml',
-    'image/avif',
-  ]
-
-  if (allowedMimeTypes.includes(file.mimetype.toLowerCase())) {
+  const mime = file.mimetype.toLowerCase()
+  if (Object.prototype.hasOwnProperty.call(MIME_TO_EXT, mime)) {
     cb(null, true)
   } else {
     cb(
       new Error(
-        'Tipo de arquivo não suportado. Envie apenas imagens (.jpg, .png, .webp, .gif, .svg).',
+        'Tipo de arquivo não suportado. Envie apenas imagens raster seguras (.jpg, .png, .webp, .gif, .avif).',
       ),
     )
   }

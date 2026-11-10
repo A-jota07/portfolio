@@ -132,4 +132,53 @@ describe('Frontend Security Audit & WebSocket Lifecycle Tests', () => {
     }
     scanDir(srcDir)
   })
+
+  it('6. Validação de URLs: Backend deve rejeitar protocolos inseguros (javascript:) em repositoryUrl e coverImage', () => {
+    const controllerContent = fs.readFileSync(
+      path.join(rootDir, 'server/src/controllers/projects.controller.ts'),
+      'utf-8',
+    )
+    assert.ok(
+      controllerContent.includes('!trimmed.startsWith(\'javascript:\')'),
+      'Schema de coverImage deve rejeitar expressamente javascript: URIs',
+    )
+    assert.ok(
+      controllerContent.includes('^https?:\\/\\/'),
+      'Schema de repositoryUrl deve restringir estritamente a protocolos http/https',
+    )
+  })
+
+  it('7. Proteção de Uploads: Middleware deve proibir extensões executáveis e mapear extensão por MIME real', () => {
+    const uploadMiddlewareContent = fs.readFileSync(
+      path.join(rootDir, 'server/src/middleware/upload.middleware.ts'),
+      'utf-8',
+    )
+    assert.ok(
+      !uploadMiddlewareContent.includes("'image/svg+xml'"),
+      'Middleware de upload não deve aceitar SVG scriptável sem sanitização',
+    )
+    assert.ok(
+      uploadMiddlewareContent.includes('MIME_TO_EXT[file.mimetype.toLowerCase()]'),
+      'Extensão do arquivo salvo deve ser derivada do MIME type seguro, nunca de originalname',
+    )
+  })
+
+  it('8. Hardening do Servidor: Deve configurar trust proxy, rate limiters e CSP em arquivos estáticos', () => {
+    const indexContent = fs.readFileSync(
+      path.join(rootDir, 'server/src/index.ts'),
+      'utf-8',
+    )
+    assert.ok(
+      indexContent.includes("app.set('trust proxy', 1)"),
+      'Servidor Express deve habilitar trust proxy para ambientes com reverse proxy',
+    )
+    assert.ok(
+      indexContent.includes("res.setHeader('Content-Security-Policy', \"default-src 'none'\")"),
+      'Servir arquivos em /uploads deve conter CSP restritiva contra execução de scripts',
+    )
+    assert.ok(
+      indexContent.includes("res.setHeader('X-Content-Type-Options', 'nosniff')"),
+      'Servir arquivos em /uploads deve definir X-Content-Type-Options: nosniff',
+    )
+  })
 })

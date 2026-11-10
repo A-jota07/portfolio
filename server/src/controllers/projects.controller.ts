@@ -13,14 +13,33 @@ import {
 const projectInputSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório.'),
   summary: z.string().min(1, 'Resumo é obrigatório.'),
-  coverImage: z.string().min(1, 'Imagem de capa é obrigatória.'),
+  coverImage: z
+    .string()
+    .min(1, 'Imagem de capa é obrigatória.')
+    .refine(
+      (val) => {
+        const trimmed = val.trim().toLowerCase()
+        return (
+          !trimmed.startsWith('javascript:') &&
+          (trimmed.startsWith('/') ||
+            trimmed.startsWith('http://') ||
+            trimmed.startsWith('https://') ||
+            trimmed.startsWith('data:image/'))
+        )
+      },
+      { message: 'URL ou caminho da imagem de capa inválido.' },
+    ),
   tags: z.array(z.string()).default([]),
   content: z.string().default(''),
   featured: z.boolean().optional().default(false),
   repositoryUrl: z
     .string()
     .nullish()
-    .transform((val) => (val && val.trim().length > 0 ? val.trim() : undefined)),
+    .transform((val) => (val && val.trim().length > 0 ? val.trim() : undefined))
+    .refine(
+      (val) => !val || /^https?:\/\//i.test(val),
+      { message: 'A URL do repositório deve iniciar com http:// ou https://' },
+    ),
 })
 
 export async function listProjectsHandler(_req: Request, res: Response): Promise<void> {

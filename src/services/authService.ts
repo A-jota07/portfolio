@@ -98,12 +98,19 @@ export async function fetchCurrentUser(): Promise<AuthUser | null> {
       try {
         const { data } = await supabaseClient.auth.getUser()
         if (data.user?.email) {
-          return {
-            email: data.user.email,
-            name:
-              (data.user.user_metadata?.displayName as string | undefined) ||
-              'Administrador',
-            role: 'admin',
+          const userRole =
+            (data.user.app_metadata?.role as string | undefined) ||
+            (data.user.user_metadata?.role as string | undefined)
+
+          // Só concede perfil admin se explicitamente configurado no Supabase
+          if (userRole === 'admin') {
+            return {
+              email: data.user.email,
+              name:
+                (data.user.user_metadata?.displayName as string | undefined) ||
+                'Administrador',
+              role: 'admin',
+            }
           }
         }
       } catch {

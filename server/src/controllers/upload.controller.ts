@@ -15,14 +15,18 @@ export const coverImageValidationSchema = z
   .min(1, 'Imagem de capa é obrigatória.')
   .refine(
     (val) => {
+      const trimmed = val.trim().toLowerCase()
+      if (trimmed.startsWith('javascript:') || trimmed.startsWith('data:text/')) {
+        return false
+      }
       return (
-        val.startsWith('/') ||
-        val.startsWith('http://') ||
-        val.startsWith('https://') ||
-        val.startsWith('data:image/')
+        trimmed.startsWith('/') ||
+        trimmed.startsWith('http://') ||
+        trimmed.startsWith('https://') ||
+        trimmed.startsWith('data:image/')
       )
     },
-    { message: 'URL ou caminho de imagem inválido.' },
+    { message: 'URL ou caminho de imagem inválido. Use um caminho relativo ou URL HTTP/HTTPS.' },
   )
 
 export async function uploadImageController(
@@ -56,6 +60,12 @@ export async function uploadImageController(
 
         if (pubData?.publicUrl) {
           imageUrl = pubData.publicUrl
+          // Remove arquivo temporário do disco local para evitar arquivos órfãos
+          try {
+            await fs.promises.unlink(req.file.path)
+          } catch {
+            // Ignora erro de remoção não-crítico
+          }
         }
       }
     } catch {
