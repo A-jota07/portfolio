@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from '@/context/AuthContext'
 import { ProjectsProvider } from '@/context/ProjectsContext'
 import { ThemeProvider } from '@/context/ThemeContext'
@@ -74,6 +75,7 @@ export function App() {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Suspense>
+              <Analytics />
             </BrowserRouter>
           </ToastProvider>
         </ProjectsProvider>
