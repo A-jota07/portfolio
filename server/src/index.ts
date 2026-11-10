@@ -51,12 +51,20 @@ app.use(
 
 app.use(express.json({ limit: '250kb' }))
 
-// Servir arquivos de imagens estáticos em /uploads com proteção estrita de headers
+// Servir arquivos de imagens e currículos estáticos em /uploads com proteção estrita de headers
 app.use(
   '/uploads',
   express.static(uploadDir, {
-    setHeaders: (res) => {
-      res.setHeader('Content-Security-Policy', "default-src 'none'")
+    setHeaders: (res, filePath) => {
+      if (filePath.toLowerCase().endsWith('.pdf')) {
+        res.setHeader(
+          'Content-Security-Policy',
+          "default-src 'self' 'unsafe-inline'; object-src 'self'",
+        )
+        res.setHeader('Content-Disposition', 'inline')
+      } else {
+        res.setHeader('Content-Security-Policy', "default-src 'none'")
+      }
       res.setHeader('X-Content-Type-Options', 'nosniff')
     },
   }),

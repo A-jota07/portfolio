@@ -81,3 +81,63 @@ export function handleSingleImageUpload(
     next()
   })
 }
+
+const resumeStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, uploadDir)
+  },
+  filename: (_req, _file, cb) => {
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`
+    cb(null, `cv-${uniqueSuffix}.pdf`)
+  },
+})
+
+const resumeFileFilter: multer.Options['fileFilter'] = (_req, file, cb) => {
+  const mime = file.mimetype.toLowerCase()
+  const ext = path.extname(file.originalname).toLowerCase()
+  if (mime === 'application/pdf' || ext === '.pdf') {
+    cb(null, true)
+  } else {
+    cb(new Error('Tipo de arquivo não suportado. Envie apenas currículo em formato .pdf.'))
+  }
+}
+
+const resumeUploader = multer({
+  storage: resumeStorage,
+  fileFilter: resumeFileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+  },
+}).single('file')
+
+export function handleSingleResumeUpload(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  resumeUploader(req, res, (err: unknown) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        res
+          .status(400)
+          .json({ error: 'O currículo excede o tamanho máximo permitido de 10MB.' })
+        return
+      }
+      res.status(400).json({ error: `Erro no upload: ${err.message}` })
+      return
+    }
+
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message })
+      return
+    }
+
+    if (err) {
+      res.status(400).json({ error: 'Erro desconhecido ao processar o currículo PDF.' })
+      return
+    }
+
+    next()
+  })
+}
+

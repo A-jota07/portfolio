@@ -69,18 +69,18 @@ html.light {
   --shadow-elevated: 0 16px 40px -6px oklch(0.18 0.02 265 / 0.12);
 }
 
-/* 5 Paletas de Acento em OKLCH */
-html[data-palette="neon"],
+/* 5 Paletas de Acento em OKLCH (Ciano como padrão) */
+html[data-palette="cyan"],
 :root {
-  --palette-hue: 295;
-  --palette-sec-hue: 340;
-  --palette-chroma: 0.23;
-}
-
-html[data-palette="cyan"] {
   --palette-hue: 210;
   --palette-sec-hue: 250;
   --palette-chroma: 0.20;
+}
+
+html[data-palette="neon"] {
+  --palette-hue: 295;
+  --palette-sec-hue: 340;
+  --palette-chroma: 0.23;
 }
 
 html[data-palette="matrix"] {
@@ -105,8 +105,8 @@ html[data-palette="magenta"] {
 :root,
 html.dark,
 html.light {
-  --active-hue: calc(var(--palette-hue, 295) + var(--section-hue-shift, 0));
-  --active-sec-hue: calc(var(--palette-sec-hue, 340) + var(--section-hue-shift, 0));
+  --active-hue: calc(var(--palette-hue, 210) + var(--section-hue-shift, 0));
+  --active-sec-hue: calc(var(--palette-sec-hue, 250) + var(--section-hue-shift, 0));
 
   --accent-300: oklch(0.82 var(--palette-chroma, 0.22) var(--active-hue));
   --accent-400: oklch(0.74 var(--palette-chroma, 0.22) var(--active-hue));

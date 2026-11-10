@@ -10,16 +10,16 @@ export interface PaletteOption {
 
 export const PALETTE_OPTIONS: PaletteOption[] = [
   {
-    id: 'neon',
-    label: 'Neon Roxo/Rosa',
-    codeLabel: 'theme.neon_violet',
-    swatch: 'oklch(0.68 0.24 295)',
-  },
-  {
     id: 'cyan',
     label: 'Ciano/Azul',
     codeLabel: 'theme.cyber_cyan',
     swatch: 'oklch(0.68 0.20 210)',
+  },
+  {
+    id: 'neon',
+    label: 'Neon Roxo/Rosa',
+    codeLabel: 'theme.neon_violet',
+    swatch: 'oklch(0.68 0.24 295)',
   },
   {
     id: 'matrix',

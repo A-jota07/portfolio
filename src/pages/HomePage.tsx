@@ -165,7 +165,7 @@ export function HomePage() {
                   Procurando um desenvolvedor com atenção aos detalhes?
                 </h2>
                 <p className="text-base leading-relaxed text-surface-600">
-                  Estou disponível para oportunidades remotas como{' '}
+                  Estou disponível para trabalho como{' '}
                   <strong className="font-semibold text-surface-900">
                     {PROFILE_DATA.role}
                   </strong>{' '}

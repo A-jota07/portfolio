@@ -144,7 +144,7 @@ export function ContactPage() {
         <SectionHeading
           codeComment="iniciar_conexao"
           title="Vamos construir algo juntos?"
-          subtitle={`Disponível para oportunidades remotas como ${PROFILE_DATA.role} ou projetos sob demanda.`}
+          subtitle={`Disponível para trabalho como ${PROFILE_DATA.role} ou projetos sob demanda.`}
           align="center"
         />
 

@@ -19,13 +19,13 @@ function getInitialMode(): ThemeMode {
 }
 
 function getInitialPalette(): ThemePalette {
-  if (typeof window === 'undefined') return 'neon'
+  if (typeof window === 'undefined') return 'cyan'
   const stored = localStorage.getItem(PALETTE_STORAGE_KEY)
-  const valid: ThemePalette[] = ['neon', 'cyan', 'matrix', 'amber', 'magenta']
+  const valid: ThemePalette[] = ['cyan', 'neon', 'matrix', 'amber', 'magenta']
   if (stored && valid.includes(stored as ThemePalette)) {
     return stored as ThemePalette
   }
-  return 'neon'
+  return 'cyan'
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

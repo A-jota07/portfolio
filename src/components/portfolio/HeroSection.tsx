@@ -5,6 +5,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Code2,
+  FileText,
   FolderGit2,
   MapPin,
   Sparkles,
@@ -12,6 +13,13 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { PROFILE_DATA } from '@/data/profile'
+import { resolveImageUrl } from '@/services/uploadService'
+import {
+  fetchResumeConfig,
+  getCachedResumeConfig,
+  RESUME_UPDATED_EVENT,
+  type ResumeConfig,
+} from '@/services/resumeService'
 
 const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_/<>#$%'
 
@@ -155,6 +163,31 @@ export function HeroSection({ publishedProjectsCount }: HeroSectionProps) {
     PROFILE_DATA.rotatingRoles,
     prefersReducedMotion,
   )
+  const [resumeConfig, setResumeConfig] = useState<ResumeConfig>(() =>
+    getCachedResumeConfig(),
+  )
+
+  useEffect(() => {
+    let active = true
+    void fetchResumeConfig().then((remote) => {
+      if (active) setResumeConfig(remote)
+    })
+
+    const handleResumeUpdate = (event: Event) => {
+      const custom = event as CustomEvent<ResumeConfig>
+      if (custom.detail) {
+        setResumeConfig(custom.detail)
+      } else {
+        setResumeConfig(getCachedResumeConfig())
+      }
+    }
+
+    window.addEventListener(RESUME_UPDATED_EVENT, handleResumeUpdate)
+    return () => {
+      active = false
+      window.removeEventListener(RESUME_UPDATED_EVENT, handleResumeUpdate)
+    }
+  }, [])
 
   return (
     <section
@@ -222,6 +255,19 @@ export function HeroSection({ publishedProjectsCount }: HeroSectionProps) {
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
+
+              {resumeConfig.enabled && resumeConfig.url && (
+                <a
+                  href={resolveImageUrl(resumeConfig.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="secondary">
+                    <FileText className="h-4 w-4 text-accent-400" />
+                    <span>Currículo PDF</span>
+                  </Button>
+                </a>
+              )}
 
               <Link to="/portfolio">
                 <Button variant="secondary">
@@ -396,7 +442,7 @@ export function HeroSection({ publishedProjectsCount }: HeroSectionProps) {
                   <div className="flex gap-3">
                     <span className="select-none text-surface-400">07</span>
                     <span className="pl-4">
-                      remoto: <span className="text-accent-400 font-semibold">true</span>,
+                      disponivel: <span className="text-accent-400 font-semibold">true</span>,
                     </span>
                   </div>
                   <div className="flex gap-3">

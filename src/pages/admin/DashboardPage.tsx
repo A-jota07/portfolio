@@ -3,6 +3,7 @@ import { Database, Plus, RefreshCw } from 'lucide-react'
 import { useProjects } from '@/hooks/useProjects'
 import { useToast } from '@/hooks/useToast'
 import { ProjectList } from '@/components/admin/ProjectList'
+import { ResumeManagerCard } from '@/components/admin/ResumeManagerCard'
 import { Button } from '@/components/ui/Button'
 
 export function DashboardPage() {
@@ -74,6 +75,7 @@ export function DashboardPage() {
           </Link>
         </div>
       </div>
+      <ResumeManagerCard />
       <ProjectList
         projects={projects}
         onDelete={(id) => {
