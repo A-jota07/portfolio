@@ -62,49 +62,21 @@ export const supabaseServerClient: SupabaseClient | null = isServerSupabaseConfi
 const DATA_DIR = path.resolve(process.cwd(), 'data')
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json')
 
-const DEFAULT_SEED_PROJECTS: ProjectRecord[] = [
-  {
-    id: '1',
-    slug: 'dashboard-analytics',
-    title: 'Dashboard Analytics',
-    summary: 'Painel interativo com gráficos em tempo real e filtros avançados.',
-    coverImage:
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
-    tags: ['React', 'TypeScript', 'D3.js'],
-    featured: true,
-    repositoryUrl: 'https://github.com/A-jota07/portfolio',
-    createdAt: '2025-11-01T10:00:00.000Z',
-    updatedAt: '2025-11-01T10:00:00.000Z',
-    content: `## Visão Geral\n\nDashboard de analytics construído com foco em **performance** e **acessibilidade**.\n\n### Destaques\n\n- Gráficos responsivos com D3.js\n- Filtros por período e categoria\n- Dark mode nativo`,
-  },
-  {
-    id: '2',
-    slug: 'ecommerce-minimal',
-    title: 'E-commerce Minimal',
-    summary: 'Loja virtual com checkout simplificado e experiência mobile-first.',
-    coverImage:
-      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&q=80',
-    tags: ['Next.js', 'Stripe', 'Tailwind'],
-    featured: true,
-    createdAt: '2025-10-15T10:00:00.000Z',
-    updatedAt: '2025-10-15T10:00:00.000Z',
-    content: `## Sobre o Projeto\n\nE-commerce com design minimalista e fluxo de compra em 3 passos.\n\n### Funcionalidades\n\n1. Catálogo com busca instantânea\n2. Carrinho persistente\n3. Pagamento via Stripe`,
-  },
-  {
-    id: '3',
-    slug: 'design-system',
-    title: 'Design System',
-    summary:
-      'Biblioteca de componentes reutilizáveis com documentação Storybook.',
-    coverImage:
-      'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80',
-    tags: ['React', 'Storybook', 'Figma'],
-    featured: false,
-    createdAt: '2025-09-20T10:00:00.000Z',
-    updatedAt: '2025-09-20T10:00:00.000Z',
-    content: `## Design System\n\nSistema de design com tokens semânticos e componentes acessíveis.`,
-  },
-]
+const DEFAULT_SEED_PROJECTS: ProjectRecord[] = []
+
+const LEGACY_SEED_SLUGS = new Set([
+  'dashboard-analytics',
+  'ecommerce-minimal',
+  'design-system',
+])
+
+function filterOutLegacySeeds(projects: ProjectRecord[]): ProjectRecord[] {
+  return projects.filter(
+    (p) =>
+      !LEGACY_SEED_SLUGS.has(p.slug) &&
+      !(p.id === '1' || p.id === '2' || p.id === '3'),
+  )
+}
 
 function ensureLocalDataFile(): ProjectRecord[] {
   if (!fs.existsSync(DATA_DIR)) {
@@ -121,7 +93,7 @@ function ensureLocalDataFile(): ProjectRecord[] {
   try {
     const raw = fs.readFileSync(PROJECTS_FILE, 'utf-8')
     const parsed = JSON.parse(raw) as ProjectRecord[]
-    return Array.isArray(parsed) ? parsed : DEFAULT_SEED_PROJECTS
+    return Array.isArray(parsed) ? filterOutLegacySeeds(parsed) : DEFAULT_SEED_PROJECTS
   } catch {
     return DEFAULT_SEED_PROJECTS
   }

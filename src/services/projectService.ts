@@ -9,6 +9,20 @@ const BASE_URL = (import.meta.env.VITE_API_URL || '')
   .replace(/\/api$/, '')
 const API_PROJECTS = `${BASE_URL}/api/projects`
 
+const LEGACY_SEED_SLUGS = new Set([
+  'dashboard-analytics',
+  'ecommerce-minimal',
+  'design-system',
+])
+
+function filterOutLegacySeeds(projects: Project[]): Project[] {
+  return projects.filter(
+    (p) =>
+      !LEGACY_SEED_SLUGS.has(p.slug) &&
+      !(p.id === '1' || p.id === '2' || p.id === '3'),
+  )
+}
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -22,14 +36,20 @@ function readProjects(): Project[] {
   const raw = localStorage.getItem(STORAGE_KEY)
   if (!raw) return []
   try {
-    return JSON.parse(raw) as Project[]
+    const parsed = JSON.parse(raw) as Project[]
+    if (!Array.isArray(parsed)) return []
+    const cleaned = filterOutLegacySeeds(parsed)
+    if (cleaned.length !== parsed.length) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned))
+    }
+    return cleaned
   } catch {
     return []
   }
 }
 
 function writeProjects(projects: Project[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(filterOutLegacySeeds(projects)))
 }
 
 function normalizeSupabaseRow(row: Record<string, unknown>): Project {
@@ -99,32 +119,13 @@ export function getProjectById(id: string): Project | undefined {
   return readProjects().find((p) => p.id === id)
 }
 
-// Busca projetos sincronizados do backend (Render/Express -> Supabase) ou direto do Supabase
+// Busca projetos sincronizados do Supabase (prioridade máxima) ou do backend (Render/Express)
 export async function fetchRemoteProjects(): Promise<{
   projects: Project[] | null
   source: 'backend' | 'supabase' | 'local'
 }> {
-  // 1. Tenta buscar da API do Backend (/api/projects)
-  try {
-    const response = await fetch(API_PROJECTS)
-    if (response.ok) {
-      const payload = (await response.json()) as {
-        data?: Project[]
-        source?: string
-      }
-      if (Array.isArray(payload.data)) {
-        writeProjects(payload.data)
-        return {
-          projects: payload.data,
-          source: payload.source === 'supabase' ? 'supabase' : 'backend',
-        }
-      }
-    }
-  } catch {
-    // Continua para o fallback
-  }
-
-  // 2. Se o cliente Supabase estiver configurado diretamente no front-end
+  // 1. PRIORIDADE: Se o cliente Supabase estiver configurado no front-end (Vercel),
+  //    busca diretamente da tabela `projects` do Supabase onde seus posts reais estão salvos!
   if (supabaseClient) {
     try {
       const { data, error } = await supabaseClient
@@ -133,15 +134,39 @@ export async function fetchRemoteProjects(): Promise<{
         .order('created_at', { ascending: false })
 
       if (!error && Array.isArray(data)) {
-        const normalized = data.map((r) =>
-          normalizeSupabaseRow(r as Record<string, unknown>),
+        const normalized = filterOutLegacySeeds(
+          data.map((r) => normalizeSupabaseRow(r as Record<string, unknown>)),
         )
         writeProjects(normalized)
         return { projects: normalized, source: 'supabase' }
       }
     } catch {
-      // Continua para o cache local
+      // Continua para tentativa via Backend API
     }
+  }
+
+  // 2. Tenta buscar da API do Backend (/api/projects na Render)
+  try {
+    const response = await fetch(API_PROJECTS)
+    if (response.ok) {
+      const payload = (await response.json()) as {
+        data?: Project[]
+        source?: string
+      }
+      if (Array.isArray(payload.data)) {
+        // Só aceita resposta do backend se vier do Supabase ou se não estivermos com Supabase configurado no front
+        if (payload.source === 'supabase' || !supabaseClient) {
+          const cleaned = filterOutLegacySeeds(payload.data)
+          writeProjects(cleaned)
+          return {
+            projects: cleaned,
+            source: payload.source === 'supabase' ? 'supabase' : 'backend',
+          }
+        }
+      }
+    }
+  } catch {
+    // Continua para o cache local
   }
 
   return { projects: null, source: 'local' }
@@ -169,32 +194,7 @@ export function createProject(input: ProjectInput): Project {
 }
 
 export async function createProjectRemote(input: ProjectInput): Promise<Project> {
-  const token = getStoredAuthToken()
-
-  // 1. Envia para a API do Backend (que persiste no Supabase e no servidor)
-  try {
-    const headers: HeadersInit = { 'Content-Type': 'application/json' }
-    if (token) headers['Authorization'] = `Bearer ${token}`
-
-    const response = await fetch(API_PROJECTS, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(input),
-    })
-
-    if (response.ok) {
-      const payload = (await response.json()) as { data?: Project }
-      if (payload.data) {
-        const current = readProjects().filter((p) => p.id !== payload.data!.id)
-        writeProjects([payload.data, ...current])
-        return payload.data
-      }
-    }
-  } catch {
-    // Continua para tentativa direta no Supabase ou local
-  }
-
-  // 2. Tentativa direta via Supabase SDK se configurado
+  // 1. Prioriza gravar diretamente no Supabase se configurado na Vercel
   if (supabaseClient) {
     try {
       const dbPayload = {
@@ -219,8 +219,33 @@ export async function createProjectRemote(input: ProjectInput): Promise<Project>
         return saved
       }
     } catch {
-      // Fallback local
+      // Continua para tentativa via API do Backend
     }
+  }
+
+  const token = getStoredAuthToken()
+
+  // 2. Envia para a API do Backend (que persiste no Supabase e no servidor)
+  try {
+    const headers: HeadersInit = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch(API_PROJECTS, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(input),
+    })
+
+    if (response.ok) {
+      const payload = (await response.json()) as { data?: Project }
+      if (payload.data) {
+        const current = readProjects().filter((p) => p.id !== payload.data!.id)
+        writeProjects([payload.data, ...current])
+        return payload.data
+      }
+    }
+  } catch {
+    // Fallback local
   }
 
   return createProject(input)
