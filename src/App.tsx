@@ -61,6 +61,7 @@ export function App() {
                   </Route>
 
                   <Route path="admin/login" element={<LoginPage />} />
+                  <Route path="login" element={<LoginPage />} />
 
                   <Route element={<ProtectedRoute />}>
                     <Route path="admin" element={<AdminLayout />}>

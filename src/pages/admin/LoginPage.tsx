@@ -26,7 +26,7 @@ export function LoginPage() {
     setIsLoading(false)
 
     if (result.success) {
-      navigate('/admin')
+      navigate('/admin', { replace: true })
     } else {
       setError(result.error ?? 'Erro ao fazer login.')
     }

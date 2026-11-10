@@ -23,8 +23,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (credentials: LoginCredentials) => {
     const result = await authService.login(credentials)
     if (result.success) {
-      const currentUser = await authService.fetchCurrentUser()
-      setUser(currentUser)
+      if (result.user) {
+        setUser(result.user)
+      } else {
+        const currentUser = await authService.fetchCurrentUser()
+        setUser(
+          currentUser ?? {
+            email: credentials.email.trim(),
+            name: 'Administrador',
+            role: 'admin',
+          },
+        )
+      }
     }
     return result
   }, [])
