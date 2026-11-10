@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { Card } from '@/components/ui/Card'
-import { getTechIcon } from '@/components/admin/TagSelect'
+import { getTechIcon } from '@/utils/techIcons'
 import { PROFILE_DATA, type SkillItem } from '@/data/profile'
 
 function SkillProgressBar({
@@ -29,29 +29,6 @@ function SkillProgressBar({
 }) {
   const barRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(barRef, { once: true, margin: '-40px' })
-  const [count, setCount] = useState(prefersReducedMotion ? skill.level : 0)
-
-  useEffect(() => {
-    if (!isInView) return
-    if (prefersReducedMotion) {
-      setCount(skill.level)
-      return
-    }
-
-    let current = 0
-    const step = Math.max(1, Math.ceil(skill.level / 28))
-    const timer = window.setInterval(() => {
-      current += step
-      if (current >= skill.level) {
-        setCount(skill.level)
-        window.clearInterval(timer)
-      } else {
-        setCount(current)
-      }
-    }, 24)
-
-    return () => window.clearInterval(timer)
-  }, [isInView, skill.level, prefersReducedMotion])
 
   return (
     <motion.div
@@ -74,7 +51,7 @@ function SkillProgressBar({
             </h3>
           </div>
           <span className="font-mono text-xs font-bold text-accent-400">
-            {count}%
+            {skill.level}%
           </span>
         </div>
 

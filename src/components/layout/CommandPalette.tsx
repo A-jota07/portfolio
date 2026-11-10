@@ -18,8 +18,9 @@ import {
   User,
   X,
 } from 'lucide-react'
-import { PALETTE_OPTIONS, useTheme } from '@/context/ThemeContext'
-import { useProjects } from '@/context/ProjectsContext'
+import { PALETTE_OPTIONS } from '@/constants/theme'
+import { useTheme } from '@/hooks/useTheme'
+import { useProjects } from '@/hooks/useProjects'
 import { PROFILE_DATA } from '@/data/profile'
 
 interface CommandItem {
@@ -47,6 +48,7 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [terminalOutput, setTerminalOutput] = useState<string[] | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const activeItemRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (isCommandOpen) {
@@ -56,6 +58,10 @@ export function CommandPalette() {
       window.setTimeout(() => inputRef.current?.focus(), 40)
     }
   }, [isCommandOpen])
+
+  useEffect(() => {
+    activeItemRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [selectedIndex])
 
   const goToSection = (sectionId: string) => {
     closeCommandPalette()
@@ -315,6 +321,15 @@ export function CommandPalette() {
               <input
                 ref={inputRef}
                 type="text"
+                role="combobox"
+                aria-expanded={isCommandOpen}
+                aria-controls="command-palette-results"
+                aria-autocomplete="list"
+                aria-activedescendant={
+                  filteredCommands[selectedIndex]
+                    ? `cmd-opt-${filteredCommands[selectedIndex].id}`
+                    : undefined
+                }
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -359,7 +374,12 @@ export function CommandPalette() {
             )}
 
             {/* Lista de comandos */}
-            <div className="max-h-[55vh] overflow-y-auto p-2">
+            <div
+              id="command-palette-results"
+              role="listbox"
+              aria-label="Resultados de comandos"
+              className="max-h-[55vh] overflow-y-auto p-2"
+            >
               {filteredCommands.length === 0 ? (
                 <div className="py-10 text-center font-mono text-xs text-surface-500">
                   Nenhum comando encontrado para "{query}". Tente digitar{' '}
@@ -387,6 +407,10 @@ export function CommandPalette() {
                           </p>
                         )}
                         <button
+                          ref={isSelected ? activeItemRef : undefined}
+                          id={`cmd-opt-${cmd.id}`}
+                          role="option"
+                          aria-selected={isSelected}
                           type="button"
                           onMouseEnter={() => setSelectedIndex(idx)}
                           onClick={cmd.action}

@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { useProjects } from '@/context/ProjectsContext'
+import { useProjects } from '@/hooks/useProjects'
+import { useToast } from '@/hooks/useToast'
 import { ProjectForm } from '@/components/admin/ProjectForm'
 
 export function CreateProjectPage() {
   const { createProject } = useProjects()
+  const toast = useToast()
   const navigate = useNavigate()
 
   return (
@@ -17,8 +19,13 @@ export function CreateProjectPage() {
       </p>
       <ProjectForm
         onSubmit={async (data) => {
-          const project = await createProject(data)
-          navigate(`/admin/editar/${project.id}`)
+          try {
+            const project = await createProject(data)
+            toast.success('Projeto criado com sucesso!', project.title)
+            navigate(`/admin/editar/${project.id}`)
+          } catch {
+            toast.error('Erro ao cadastrar projeto.')
+          }
         }}
         submitLabel="Criar e Publicar Projeto"
       />

@@ -5,7 +5,7 @@ import { ArrowUpRight, FileCode2, Sparkles } from 'lucide-react'
 import type { Project } from '@/types/project'
 import { Card } from '@/components/ui/Card'
 import { HoverZoomImage } from '@/components/ui/HoverZoomImage'
-import { getTechIcon } from '@/components/admin/TagSelect'
+import { getTechIcon } from '@/utils/techIcons'
 
 interface ProjectCardProps {
   project: Project

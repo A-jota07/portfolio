@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthContext'
 import { ProjectsProvider } from '@/context/ProjectsContext'
 import { ThemeProvider } from '@/context/ThemeContext'
+import { ToastProvider } from '@/components/ui/Toast'
 import { Layout } from '@/components/layout/Layout'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { HomePage } from '@/pages/HomePage'
@@ -48,30 +49,32 @@ export function App() {
     <ThemeProvider>
       <AuthProvider>
         <ProjectsProvider>
-          <BrowserRouter>
-            <Suspense fallback={<RouteLoader />}>
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route index element={<HomePage />} />
-                  <Route path="portfolio" element={<PortfolioPage />} />
-                  <Route path="portfolio/:slug" element={<ProjectDetailPage />} />
-                  <Route path="contato" element={<ContactPage />} />
-                </Route>
-
-                <Route path="admin/login" element={<LoginPage />} />
-
-                <Route element={<ProtectedRoute />}>
-                  <Route path="admin" element={<AdminLayout />}>
-                    <Route index element={<DashboardPage />} />
-                    <Route path="novo" element={<CreateProjectPage />} />
-                    <Route path="editar/:id" element={<EditProjectPage />} />
+          <ToastProvider>
+            <BrowserRouter>
+              <Suspense fallback={<RouteLoader />}>
+                <Routes>
+                  <Route element={<Layout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path="portfolio" element={<PortfolioPage />} />
+                    <Route path="portfolio/:slug" element={<ProjectDetailPage />} />
+                    <Route path="contato" element={<ContactPage />} />
                   </Route>
-                </Route>
 
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
+                  <Route path="admin/login" element={<LoginPage />} />
+
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="admin" element={<AdminLayout />}>
+                      <Route index element={<DashboardPage />} />
+                      <Route path="novo" element={<CreateProjectPage />} />
+                      <Route path="editar/:id" element={<EditProjectPage />} />
+                    </Route>
+                  </Route>
+
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </ToastProvider>
         </ProjectsProvider>
       </AuthProvider>
     </ThemeProvider>

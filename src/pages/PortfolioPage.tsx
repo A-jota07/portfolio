@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Search, X } from 'lucide-react'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ProjectCard } from '@/components/portfolio/ProjectCard'
-import { useProjects } from '@/context/ProjectsContext'
+import { useProjects } from '@/hooks/useProjects'
 import { supabase } from '@/services/supabaseClient'
 
 export function PortfolioPage() {
@@ -38,6 +38,16 @@ export function PortfolioPage() {
       p.tags.forEach((t) => set.add(t))
     })
     return ['Todos', ...Array.from(set)]
+  }, [projects])
+
+  const tagCounts = useMemo(() => {
+    const counts: Record<string, number> = { Todos: projects.length }
+    projects.forEach((p) => {
+      p.tags.forEach((t) => {
+        counts[t] = (counts[t] || 0) + 1
+      })
+    })
+    return counts
   }, [projects])
 
   const filteredProjects = useMemo(() => {
@@ -89,9 +99,9 @@ export function PortfolioPage() {
             )}
           </div>
 
-          {/* Chips de filtro derivados dinamicamente */}
+          {/* Chips de filtro com contadores dinâmicos */}
           <div
-            role="tablist"
+            role="group"
             aria-label="Filtrar projetos por tecnologia"
             className="flex flex-wrap gap-1.5"
           >
@@ -101,8 +111,7 @@ export function PortfolioPage() {
                 <button
                   key={tag}
                   type="button"
-                  role="tab"
-                  aria-selected={active}
+                  aria-pressed={active}
                   onClick={() => setSelectedTag(tag)}
                   className={`relative min-h-[36px] rounded-xl px-3 py-1.5 font-mono text-xs font-medium transition-colors cursor-pointer ${
                     active
@@ -118,6 +127,13 @@ export function PortfolioPage() {
                     />
                   )}
                   <span>{tag}</span>
+                  <span
+                    className={`ml-1.5 font-mono text-[10px] ${
+                      active ? 'text-white/80' : 'text-surface-400'
+                    }`}
+                  >
+                    ({tagCounts[tag] ?? 0})
+                  </span>
                 </button>
               )
             })}

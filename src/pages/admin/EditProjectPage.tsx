@@ -1,11 +1,13 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useProjects } from '@/context/ProjectsContext'
+import { useProjects } from '@/hooks/useProjects'
+import { useToast } from '@/hooks/useToast'
 import { ProjectForm } from '@/components/admin/ProjectForm'
 import { Button } from '@/components/ui/Button'
 
 export function EditProjectPage() {
   const { id } = useParams<{ id: string }>()
   const { getById, updateProject } = useProjects()
+  const toast = useToast()
   const navigate = useNavigate()
   const project = id ? getById(id) : undefined
 
@@ -42,10 +44,16 @@ export function EditProjectPage() {
           tags: project.tags,
           content: project.content,
           featured: project.featured,
+          repositoryUrl: project.repositoryUrl ?? '',
         }}
         onSubmit={async (data) => {
-          await updateProject(project.id, data)
-          navigate('/admin')
+          try {
+            await updateProject(project.id, data)
+            toast.success('Projeto atualizado com sucesso!')
+            navigate('/admin')
+          } catch {
+            toast.error('Erro ao salvar alterações do projeto.')
+          }
         }}
         submitLabel="Salvar e Sincronizar"
       />

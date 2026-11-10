@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/Button'
 import { ProjectCard } from '@/components/portfolio/ProjectCard'
 import { HeroSection } from '@/components/portfolio/HeroSection'
 import { AboutSkillsSection } from '@/components/portfolio/AboutSkillsSection'
-import { useProjects } from '@/context/ProjectsContext'
-import { useTheme } from '@/context/ThemeContext'
+import { useProjects } from '@/hooks/useProjects'
+import { useTheme } from '@/hooks/useTheme'
 import { PROFILE_DATA } from '@/data/profile'
 
 export function HomePage() {

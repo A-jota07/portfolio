@@ -144,19 +144,28 @@ export function ImageUploadInput({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,image/avif"
+            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
             onChange={handleFileChange}
             className="hidden"
             id="cover-image-file-input"
           />
 
           <div
+            role="button"
+            tabIndex={0}
+            aria-label="Fazer upload de imagem de capa"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                if (!isUploading) fileInputRef.current?.click()
+              }
+            }}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
             onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-all cursor-pointer ${
+            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-all cursor-pointer focus:ring-2 focus:ring-accent-400 focus:outline-none ${
               dragActive
                 ? 'border-accent-400 bg-accent-500/10'
                 : 'border-surface-200 bg-surface-50/70 hover:border-accent-400/50 hover:bg-surface-100/50'

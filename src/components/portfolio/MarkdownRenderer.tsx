@@ -3,15 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import 'highlight.js/styles/github-dark.css'
-
-export function slugifyHeading(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-}
+import { slugifyHeading } from '@/utils/slugify'
 
 function extractTextFromChildren(children: React.ReactNode): string {
   if (typeof children === 'string' || typeof children === 'number') {
@@ -56,6 +48,22 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
         <h3 id={id} {...props}>
           {children}
         </h3>
+      )
+    },
+    a: ({ href, children, ...props }) => {
+      if (!href || href.trim().toLowerCase().startsWith('javascript:')) {
+        return <span {...props}>{children}</span>
+      }
+      const isExternal = href.startsWith('http://') || href.startsWith('https://')
+      return (
+        <a
+          href={href}
+          target={isExternal ? '_blank' : undefined}
+          rel={isExternal ? 'noopener noreferrer' : undefined}
+          {...props}
+        >
+          {children}
+        </a>
       )
     },
   }

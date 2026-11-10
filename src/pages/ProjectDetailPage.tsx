@@ -10,10 +10,11 @@ import {
   FileCode2,
   ListTree,
 } from 'lucide-react'
-import { useProjects } from '@/context/ProjectsContext'
-import { MarkdownRenderer, slugifyHeading } from '@/components/portfolio/MarkdownRenderer'
+import { useProjects } from '@/hooks/useProjects'
+import { MarkdownRenderer } from '@/components/portfolio/MarkdownRenderer'
+import { slugifyHeading } from '@/utils/slugify'
 import { Button } from '@/components/ui/Button'
-import { getTechIcon } from '@/components/admin/TagSelect'
+import { getTechIcon } from '@/utils/techIcons'
 import { resolveImageUrl } from '@/services/uploadService'
 
 interface TocItem {
@@ -155,8 +156,8 @@ export function ProjectDetailPage() {
               {project.summary}
             </p>
 
-            {/* Link direto para o repositório (exibido apenas se preenchido) */}
-            {project.repositoryUrl && project.repositoryUrl.trim() && (
+            {/* Link direto para o repositório (exibido apenas se preenchido e seguro) */}
+            {project.repositoryUrl && /^https?:\/\//i.test(project.repositoryUrl.trim()) && (
               <div className="mt-5 flex flex-wrap items-center gap-3">
                 <a
                   href={project.repositoryUrl}

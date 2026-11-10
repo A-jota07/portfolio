@@ -1,31 +1,15 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
 import type { Project, ProjectInput } from '@/types/project'
 import * as projectService from '@/services/projectService'
 import { SEED_PROJECTS } from '@/data/seedProjects'
-
-export type SyncSource = 'supabase' | 'backend' | 'local'
-
-interface ProjectsContextValue {
-  projects: Project[]
-  isSyncing: boolean
-  syncSource: SyncSource
-  refresh: () => Promise<void>
-  createProject: (input: ProjectInput) => Promise<Project>
-  updateProject: (id: string, input: Partial<ProjectInput>) => Promise<Project | null>
-  deleteProject: (id: string) => Promise<boolean>
-  getBySlug: (slug: string) => Project | undefined
-  getById: (id: string) => Project | undefined
-}
-
-const ProjectsContext = createContext<ProjectsContextValue | null>(null)
+import { ProjectsContext, type SyncSource } from '@/hooks/useProjects'
 
 export function ProjectsProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<Project[]>(() => {
@@ -34,6 +18,7 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
   })
   const [isSyncing, setIsSyncing] = useState<boolean>(true)
   const [syncSource, setSyncSource] = useState<SyncSource>('local')
+  const lastFocusSyncRef = useRef<number>(Date.now())
 
   const refresh = useCallback(async () => {
     setIsSyncing(true)
@@ -52,9 +37,12 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void refresh()
 
-    // Sincroniza automaticamente quando a aba do navegador volta a ganhar foco
+    // Sincroniza automaticamente quando a aba do navegador volta a ganhar foco (throttle de 60s)
     const handleFocus = () => {
-      void refresh()
+      if (Date.now() - lastFocusSyncRef.current > 60_000) {
+        lastFocusSyncRef.current = Date.now()
+        void refresh()
+      }
     }
     window.addEventListener('focus', handleFocus)
 
@@ -108,12 +96,4 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
   )
 
   return <ProjectsContext.Provider value={value}>{children}</ProjectsContext.Provider>
-}
-
-export function useProjects(): ProjectsContextValue {
-  const context = useContext(ProjectsContext)
-  if (!context) {
-    throw new Error('useProjects deve ser usado dentro de ProjectsProvider')
-  }
-  return context
 }

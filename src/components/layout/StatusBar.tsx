@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { GitBranch, Clock, Sparkles, Command, Sun, Moon } from 'lucide-react'
-import { PALETTE_OPTIONS, useTheme } from '@/context/ThemeContext'
+import { PALETTE_OPTIONS } from '@/constants/theme'
+import { useTheme } from '@/hooks/useTheme'
 import { PROFILE_DATA } from '@/data/profile'
 
 export function StatusBar() {

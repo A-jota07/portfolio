@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { ExternalLink, LogOut, Moon, Sun, Terminal } from 'lucide-react'
-import { useAuth } from '@/context/AuthContext'
-import { useTheme } from '@/context/ThemeContext'
+import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/hooks/useTheme'
 import { Button } from '@/components/ui/Button'
 
 export function AdminLayout() {

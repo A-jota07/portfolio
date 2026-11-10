@@ -1,11 +1,26 @@
 import { Link } from 'react-router-dom'
 import { Database, Plus, RefreshCw } from 'lucide-react'
-import { useProjects } from '@/context/ProjectsContext'
+import { useProjects } from '@/hooks/useProjects'
+import { useToast } from '@/hooks/useToast'
 import { ProjectList } from '@/components/admin/ProjectList'
 import { Button } from '@/components/ui/Button'
 
 export function DashboardPage() {
   const { projects, isSyncing, syncSource, refresh, deleteProject } = useProjects()
+  const toast = useToast()
+
+  const handleDelete = async (id: string) => {
+    try {
+      const success = await deleteProject(id)
+      if (success) {
+        toast.success('Projeto excluído com sucesso!')
+      } else {
+        toast.error('Não foi possível excluir o projeto.')
+      }
+    } catch {
+      toast.error('Erro inesperado ao excluir projeto.')
+    }
+  }
 
   const syncLabel =
     syncSource === 'supabase'
@@ -62,7 +77,7 @@ export function DashboardPage() {
       <ProjectList
         projects={projects}
         onDelete={(id) => {
-          void deleteProject(id)
+          void handleDelete(id)
         }}
       />
     </div>

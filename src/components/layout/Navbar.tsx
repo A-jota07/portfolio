@@ -14,8 +14,9 @@ import {
   Terminal,
   X,
 } from 'lucide-react'
-import { useAuth } from '@/context/AuthContext'
-import { PALETTE_OPTIONS, useTheme } from '@/context/ThemeContext'
+import { useAuth } from '@/hooks/useAuth'
+import { PALETTE_OPTIONS } from '@/constants/theme'
+import { useTheme } from '@/hooks/useTheme'
 
 const navTabs = [
   { to: '/', label: '_inicio.tsx', shortLabel: '_inicio', icon: FileCode2 },
