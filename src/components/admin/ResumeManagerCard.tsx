@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {
   CheckCircle2,
+  Download,
   Eye,
   EyeOff,
   FileText,
@@ -10,10 +11,12 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/hooks/useToast'
-import { resolveImageUrl } from '@/services/uploadService'
 import {
+  downloadPdfFile,
   fetchResumeConfig,
   getCachedResumeConfig,
+  openPdfInNewTab,
+  resolvePdfViewerUrl,
   RESUME_UPDATED_EVENT,
   updateResumeConfig,
   uploadResumePdf,
@@ -109,7 +112,7 @@ export function ResumeManagerCard() {
   }
 
   const hasResume = Boolean(config.url)
-  const resolvedPdfUrl = hasResume ? resolveImageUrl(config.url) : ''
+  const resolvedPdfUrl = hasResume ? resolvePdfViewerUrl(config.url) : ''
 
   return (
     <div className="bento-card mb-8 rounded-2xl p-6">
@@ -189,11 +192,28 @@ export function ResumeManagerCard() {
                 href={resolvedPdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (config.url?.startsWith('data:')) {
+                    e.preventDefault()
+                    openPdfInNewTab(config.url)
+                  }
+                }}
                 className="inline-flex min-h-[42px] items-center gap-1.5 rounded-xl border border-surface-200 bg-surface-100/80 px-3.5 py-2 font-mono text-xs font-medium text-surface-700 transition-colors hover:border-accent-400/50 hover:text-surface-900"
               >
                 <FileText className="h-3.5 w-3.5 text-accent-400" />
                 <span>Abrir em Nova Aba</span>
               </a>
+
+              <Button
+                type="button"
+                variant="secondary"
+                magnetic={false}
+                onClick={() => downloadPdfFile(config.url, config.filename)}
+                title="Baixar arquivo PDF do currículo"
+              >
+                <Download className="h-4 w-4 text-accent-400" />
+                <span>Baixar</span>
+              </Button>
 
               <Button
                 type="button"
@@ -255,6 +275,12 @@ export function ResumeManagerCard() {
               href={resolvedPdfUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                if (config.url?.startsWith('data:')) {
+                  e.preventDefault()
+                  openPdfInNewTab(config.url)
+                }
+              }}
               className="text-accent-400 hover:underline"
             >
               Abrir tela cheia ↗

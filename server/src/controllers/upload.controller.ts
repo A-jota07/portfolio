@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import fs from 'fs'
+import path from 'path'
 import { z } from 'zod'
 import { supabaseServerClient } from '../services/projects.service.js'
 import {
@@ -186,4 +187,91 @@ export async function uploadResumeController(
     config,
   })
 }
+
+export async function viewResumeFileController(
+  _req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const config = await getResumeConfigService()
+    if (!config.url) {
+      res.status(404).json({ error: 'Nenhum currículo configurado.' })
+      return
+    }
+
+    if (config.url.startsWith('http://') || config.url.startsWith('https://')) {
+      res.redirect(config.url)
+      return
+    }
+
+    const filename = path.basename(config.url)
+    const filePath = path.resolve(process.cwd(), 'uploads', filename)
+
+    if (fs.existsSync(filePath)) {
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${encodeURIComponent(config.filename || 'curriculo.pdf')}"`,
+      )
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+      res.setHeader('Cache-Control', 'public, max-age=300')
+      const stream = fs.createReadStream(filePath)
+      stream.pipe(res)
+      return
+    }
+
+    if (supabaseServerClient) {
+      const storagePath = `resumes/${filename}`
+      const { data: pubData } = supabaseServerClient.storage
+        .from('portfolio')
+        .getPublicUrl(storagePath)
+      if (pubData?.publicUrl) {
+        res.redirect(pubData.publicUrl)
+        return
+      }
+    }
+
+    res.status(404).json({ error: 'Arquivo do currículo não encontrado no servidor.' })
+  } catch {
+    res.status(500).json({ error: 'Erro ao carregar documento.' })
+  }
+}
+
+export async function downloadResumeFileController(
+  _req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const config = await getResumeConfigService()
+    if (!config.url) {
+      res.status(404).json({ error: 'Nenhum currículo configurado.' })
+      return
+    }
+
+    if (config.url.startsWith('http://') || config.url.startsWith('https://')) {
+      res.redirect(config.url)
+      return
+    }
+
+    const filename = path.basename(config.url)
+    const filePath = path.resolve(process.cwd(), 'uploads', filename)
+
+    if (fs.existsSync(filePath)) {
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${encodeURIComponent(config.filename || 'curriculo.pdf')}"`,
+      )
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+      const stream = fs.createReadStream(filePath)
+      stream.pipe(res)
+      return
+    }
+
+    res.status(404).json({ error: 'Arquivo do currículo não encontrado para download.' })
+  } catch {
+    res.status(500).json({ error: 'Erro ao baixar documento.' })
+  }
+}
+
 

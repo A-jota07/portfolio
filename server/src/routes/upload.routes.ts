@@ -7,10 +7,12 @@ import {
   handleSingleResumeUpload,
 } from '../middleware/upload.middleware.js'
 import {
+  downloadResumeFileController,
   getResumeConfigController,
   updateResumeConfigController,
   uploadImageController,
   uploadResumeController,
+  viewResumeFileController,
 } from '../controllers/upload.controller.js'
 
 export const uploadRouter = Router()
@@ -36,6 +38,8 @@ uploadRouter.post(
 
 // Rotas de gerenciamento e upload de currículo em PDF
 uploadRouter.get('/resume', getResumeConfigController)
+uploadRouter.get('/resume/view', viewResumeFileController)
+uploadRouter.get('/resume/download', downloadResumeFileController)
 
 uploadRouter.put(
   '/resume',

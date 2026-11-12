@@ -35,7 +35,7 @@ if (!fs.existsSync(uploadDir)) {
 
 app.use(
   helmet({
-    contentSecurityPolicy: env.NODE_ENV === 'production',
+    contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   }),
 )
@@ -79,11 +79,9 @@ app.use(
   express.static(uploadDir, {
     setHeaders: (res, filePath) => {
       if (filePath.toLowerCase().endsWith('.pdf')) {
-        res.setHeader(
-          'Content-Security-Policy',
-          "default-src 'self' 'unsafe-inline'; object-src 'self'",
-        )
+        res.setHeader('Content-Type', 'application/pdf')
         res.setHeader('Content-Disposition', 'inline')
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
       } else {
         res.setHeader('Content-Security-Policy', "default-src 'none'")
       }

@@ -13,10 +13,11 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { PROFILE_DATA } from '@/data/profile'
-import { resolveImageUrl } from '@/services/uploadService'
 import {
   fetchResumeConfig,
   getCachedResumeConfig,
+  openPdfInNewTab,
+  resolvePdfViewerUrl,
   RESUME_UPDATED_EVENT,
   type ResumeConfig,
 } from '@/services/resumeService'
@@ -258,9 +259,15 @@ export function HeroSection({ publishedProjectsCount }: HeroSectionProps) {
 
               {resumeConfig.enabled && resumeConfig.url && (
                 <a
-                  href={resolveImageUrl(resumeConfig.url)}
+                  href={resolvePdfViewerUrl(resumeConfig.url)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => {
+                    if (resumeConfig.url.startsWith('data:')) {
+                      e.preventDefault()
+                      openPdfInNewTab(resumeConfig.url)
+                    }
+                  }}
                 >
                   <Button variant="secondary">
                     <FileText className="h-4 w-4 text-accent-400" />

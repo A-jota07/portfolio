@@ -171,6 +171,60 @@ function fileToDataUrl(file: File): Promise<string> {
   })
 }
 
+export function dataUrlToBlob(dataUrl: string): Blob {
+  const parts = dataUrl.split(',')
+  const mimeMatch = parts[0]?.match(/:(.*?);/)
+  const mime = mimeMatch ? mimeMatch[1] : 'application/pdf'
+  const bstr = atob(parts[1] || '')
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new Blob([u8arr], { type: mime })
+}
+
+export function resolvePdfViewerUrl(url?: string): string {
+  if (!url) return ''
+  if (url.startsWith('data:application/pdf') || url.startsWith('data:')) {
+    try {
+      const blob = dataUrlToBlob(url)
+      return URL.createObjectURL(blob)
+    } catch {
+      return url
+    }
+  }
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('blob:')
+  ) {
+    return url
+  }
+  if (url.startsWith('/uploads/')) {
+    return BASE_URL ? `${BASE_URL}/api/upload/resume/view` : '/api/upload/resume/view'
+  }
+  return `${BASE_URL}${url}`
+}
+
+export function openPdfInNewTab(url?: string): void {
+  if (!url) return
+  const targetUrl = resolvePdfViewerUrl(url)
+  if (!targetUrl) return
+  window.open(targetUrl, '_blank', 'noopener,noreferrer')
+}
+
+export function downloadPdfFile(url?: string, filename = 'curriculo.pdf'): void {
+  if (!url) return
+  const targetUrl = resolvePdfViewerUrl(url)
+  const a = document.createElement('a')
+  a.href = targetUrl
+  a.download = filename.endsWith('.pdf') ? filename : `${filename}.pdf`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
 export async function uploadResumePdf(file: File): Promise<ResumeConfig> {
   const isPdf =
     file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
@@ -182,6 +236,51 @@ export async function uploadResumePdf(file: File): Promise<ResumeConfig> {
     throw new Error('O currículo excede o tamanho máximo permitido de 10MB.')
   }
 
+  // 1. PRIORIDADE SUPABASE STORAGE: Se conectado diretamente no front-end (Vercel)
+  if (supabaseClient) {
+    try {
+      const storagePath = `resumes/cv-${Date.now()}.pdf`
+      const { error: upErr } = await supabaseClient.storage
+        .from('portfolio')
+        .upload(storagePath, file, {
+          contentType: 'application/pdf',
+          upsert: true,
+        })
+
+      if (!upErr) {
+        const { data: pubData } = supabaseClient.storage
+          .from('portfolio')
+          .getPublicUrl(storagePath)
+
+        if (pubData?.publicUrl) {
+          const supaConfig: ResumeConfig = {
+            url: pubData.publicUrl,
+            filename: file.name,
+            enabled: true,
+            updatedAt: new Date().toISOString(),
+          }
+          await syncConfigToSupabase(supaConfig)
+          saveCachedResumeConfig(supaConfig)
+
+          // Notifica a API na Render em background para sincronizar
+          const token = getStoredAuthToken()
+          const headers: HeadersInit = { 'Content-Type': 'application/json' }
+          if (token) headers['Authorization'] = `Bearer ${token}`
+          void fetch(RESUME_ENDPOINT, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(supaConfig),
+          }).catch(() => {})
+
+          return supaConfig
+        }
+      }
+    } catch {
+      // Prossegue para tentativa via backend na Render
+    }
+  }
+
+  // 2. BACKEND EXPRESS NA RENDER
   const formData = new FormData()
   formData.append('file', file)
 
@@ -219,59 +318,22 @@ export async function uploadResumePdf(file: File): Promise<ResumeConfig> {
       throw new Error(errData.error)
     }
   } catch (err) {
-    // Se for um erro explícito de validação do servidor, repassa
     if (err instanceof Error && err.message.includes('tamanho')) {
       throw err
     }
+  }
 
-    // 2. Fallback direto para o Supabase Storage (quando o front na Vercel está conectado ao Supabase)
-    if (supabaseClient) {
-      try {
-        const storagePath = `resumes/cv-${Date.now()}.pdf`
-        const { error: upErr } = await supabaseClient.storage
-          .from('portfolio')
-          .upload(storagePath, file, {
-            contentType: 'application/pdf',
-            upsert: true,
-          })
-
-        if (!upErr) {
-          const { data: pubData } = supabaseClient.storage
-            .from('portfolio')
-            .getPublicUrl(storagePath)
-
-          if (pubData?.publicUrl) {
-            const supaConfig: ResumeConfig = {
-              url: pubData.publicUrl,
-              filename: file.name,
-              enabled: true,
-              updatedAt: new Date().toISOString(),
-            }
-            await syncConfigToSupabase(supaConfig)
-            saveCachedResumeConfig(supaConfig)
-            return supaConfig
-          }
-        }
-      } catch {
-        // Continua para fallback local Base64
-      }
+  // 3. FALLBACK LOCAL (Data URL Base64) quando offline / sem rede
+  if (file.size <= 4 * 1024 * 1024) {
+    const dataUrl = await fileToDataUrl(file)
+    const localConfig: ResumeConfig = {
+      url: dataUrl,
+      filename: file.name,
+      enabled: true,
+      updatedAt: new Date().toISOString(),
     }
-
-    // 3. Fallback local (Base64 Data URL) quando o backend não está acessível
-    if (file.size <= 4 * 1024 * 1024) {
-      const dataUrl = await fileToDataUrl(file)
-      const localConfig: ResumeConfig = {
-        url: dataUrl,
-        filename: file.name,
-        enabled: true,
-        updatedAt: new Date().toISOString(),
-      }
-      saveCachedResumeConfig(localConfig)
-      return localConfig
-    }
-    throw new Error(
-      'Servidor indisponível e o arquivo excede 4MB para armazenamento em cache local.',
-    )
+    saveCachedResumeConfig(localConfig)
+    return localConfig
   }
 
   throw new Error('Não foi possível concluir o envio do currículo PDF.')
